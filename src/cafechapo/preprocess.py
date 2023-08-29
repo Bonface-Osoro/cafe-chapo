@@ -5,7 +5,6 @@ import rasterio
 import geopandas as gpd
 import pandas as pd
 from rasterio.mask import mask
-from scipy.spatial import Voronoi
 from shapely.geometry import Polygon
 from shapely.geometry import MultiPolygon
 from tqdm import tqdm
@@ -129,7 +128,7 @@ class ProcessCountry:
 
         shape_path = os.path.join(path, 'national_outline.shp')
 
-        path = os.path.join('data', 'raw', 'gadm36_0.shp')
+        path = os.path.join('data', 'raw', 'boundaries', 'gadm36_0.shp')
 
         countries = gpd.read_file(path)
 
@@ -201,7 +200,7 @@ class ProcessRegions:
                 os.mkdir(folder)
 
             filename = 'gadm36_{}.shp'.format(regional_level)
-            path_regions = os.path.join('data', 'raw', filename)
+            path_regions = os.path.join('data', 'raw', 'boundaries', filename)
             regions = gpd.read_file(path_regions)
 
             regions = regions[regions.GID_0 == self.country_iso3]
@@ -563,146 +562,3 @@ class ProcessPopulation:
                 pass
 
         return None
-
-
-class WealthProcess:
-    """
-    This class process the LMIC country wealth data.
-    """
-
-
-    def __init__(self, csv_country, country_iso3):
-        """
-        A class constructor
-
-        Arguments
-        ---------
-        csv_country : string
-            Name of the country metadata file.
-        country_iso3 : string
-            Country iso3 to be processed.
-        """
-        self.csv_country = csv_country
-        self.country_iso3 = country_iso3
-
-
-    def process_national_rwi(self):
-        """
-
-        Function to process relative wealth 
-        of a single LMIC country.
-        """
-        iso3 = self.country_iso3
-        filename = '{}_relative_wealth_index.csv'.format(iso3)
-        path_rwi = os.path.join(BASE_PATH, 'raw', 'rwi', filename)
-
-        if os.path.isfile(path_rwi):
-
-            wealth = gpd.read_file(path_rwi, encoding = 'latin-1')
-
-            #making long lat points into geometry column
-            gdf = gpd.GeoDataFrame(wealth, geometry = gpd.points_from_xy(wealth.longitude, wealth.latitude), 
-                                crs = 'EPSG:4326') 
-            #setting path out
-            filename_out = '{}_relative_wealth_index.shp'.format(iso3) 
-            folder_out = os.path.join(BASE_PATH, 'processed', iso3 , 'rwi', 'national')
-
-            if not os.path.exists(folder_out):
-
-                os.makedirs(folder_out)
-
-            path_out = os.path.join(folder_out, filename_out)
-
-            gdf.to_file(path_out,crs = 'EPSG:4326')
-        
-        else:
-
-            print('{}.relative wealth data not found. Skipping...'.format(iso3))
-
-        return print('Relative wealth processing completed for {}'.format(iso3))
-    
-
-    def process_regional_rwi(self):
-        """
-        Function to process relative wealth 
-        of a single region of an LMIC country.  
-        """
-        countries = pd.read_csv(self.csv_country, encoding = 'latin-1')
-
-        iso3 = self.country_iso3
-
-        for idx, country in countries.iterrows():
-
-            if not country["iso3"] == iso3:
-
-                continue
-
-            iso3 = country['iso3']                 
-            gid_region = country['gid_region']
-            gid_level = 'GID_{}'.format(gid_region)
-
-            filename = 'regions_{}_{}.shp'.format(gid_region, iso3)
-            folder = os.path.join('data','processed', iso3, 'regions')
-            path_regions = os.path.join(folder, filename)
-            regions = gpd.read_file(path_regions, crs = 'epsg:4326')
-
-            for idx, region in regions.iterrows():
-
-                gid_id = region[gid_level]
-
-                #loading in gid level shapefile
-                filename = 'regions_{}_{}.shp'.format(gid_region, iso3)
-                path_region = os.path.join(BASE_PATH, 'processed', iso3, 'regions', filename)
-                gdf_region = gpd.read_file(path_region, crs = 'EPSG:4326')
-
-                #loading in rwi info
-                filename = '{}_relative_wealth_index.shp'.format(iso3) 
-                folder = os.path.join(BASE_PATH, 'processed', iso3 , 'rwi', 'national')
-                path_rwi = os.path.join(folder, filename)
-
-                if os.path.isfile(path_rwi):
-
-                    gdf_rwi = gpd.read_file(path_rwi, crs = 'EPSG:4326')
-                    gdf_region = gdf_region[gdf_region[gid_level] == gid_id]
-
-                    print('Intersecting wealth data {}'.format(gid_id))
-
-                    gdf_rwi = gpd.overlay(gdf_rwi, gdf_region, how = 'intersection')
-
-                    # Extract coordinates from GeoDataFrame
-                    points = gdf_rwi.geometry.apply(lambda p: (p.x, p.y)).tolist()
-
-                    # Generate Voronoi diagram
-                    vor = Voronoi(points)
-
-                    # Create empty list to store polygons
-                    voronoi_polygons = []
-
-                    # Iterate over the regions and create polygons
-                    for region in vor.regions:
-
-                        if not -1 in region and len(region) > 0:
-
-                            polygon_vertices = [vor.vertices[i] for i in region]
-                            polygon = Polygon(polygon_vertices)
-                            voronoi_polygons.append(polygon)
-
-                    # Create a GeoDataFrame from the Voronoi polygons
-                    voronoi_gdf = gpd.GeoDataFrame(geometry = voronoi_polygons)
-
-                    filename = '{}.shp'.format(gid_id)
-                    folder_out = os.path.join(BASE_PATH, 'processed', iso3, 'rwi', 'regions' )
-
-                    if not os.path.exists(folder_out):
-
-                        os.makedirs(folder_out)
-                        
-                    path_out = os.path.join(folder_out, filename)
-
-                    voronoi_gdf.to_file(path_out, crs = 'EPSG:4326')
-
-                else:
-
-                    print('{} relative wealth data not found. Skipping...'.format(iso3))
-
-        return print('Regional relative wealth processing completed for {}'.format(iso3))
