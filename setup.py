@@ -17,10 +17,10 @@ def readme():
 
 
 setup(
-    name='cafe-chapo',
+    name='cafe-visit',
     use_scm_version=True,
     license='MIT License',
-    description='Capacitated Facility Location of Electric Charging Points (cafe-chapo)',
+    description='Capacitated Facility Location Model for Electric Vehicle Service Centers (cafe-visit)',
     long_description=readme(),
     long_description_content_type="text/markdown",
     author='Bonface Osoro',

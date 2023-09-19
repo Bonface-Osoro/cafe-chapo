@@ -1,11 +1,9 @@
-# Capacitated Facility Location of Electric Charging Points (cafe-chapo)
-Over the next century we are expected to experience an increase in the frequency and severity of climate-related hazards, including coastal flooding, riverine flooding, and tropical storms. Dealing with extreme events is considerably easy for the affluent, who have the resources to vacate to a safer location and replace damaged property. In contrast, those living on the poverty line (US$ 2 per day) often must shelter in place and may have their entire livelihood disrupted from storm damage. 
-
-1.	What portion of the global poverty-line population is unconnected (to 2G, 3G, 4G and 5G) and where are they?
+# Capacitated Facility Location Model for Electric Vehicle Service Centers (cafe-visit)
+According to the International Energy Agency, the electric car sales in 2022 exceeded 10 million indicating that it has tripled in the last three years. This number is expected to grow especially at the backdrop of policies and efforts to decarbonize. However, the switch to electric vehicles will require extensive supporting infrastructure such as servicing centers and charging point for countries that are yet to adopt them. Although the electric vehicles are not made out of a completely new technology, servicing them will require new set of skills that may be lacking among conventional mechanics and technicians in developing world. Therefore, it is important for the distributors and sellers of EV to setup regional service centers for repairs, training and retraining of the car users. Setting such a center requires initial capital investment as well as ensuring that it is located in an optimal position where it serves the needs of the nearby car owners. To this end, this work seeks to develop a model for determining the optimal number and location of EV service centers in Kenya. The model will account for the cost of reaching the service center as well as the fixed construction cost. A hypothetical cost of taxes, electricity, rent and maintenance will be included as fixed costs. The number of potential car owners will be obtained from population satellite raster layers and calculated as a percentage of the total population. Therefore, the paper will determine the number and location of service centers that meet the customers demand while reducing the access and fixed costs. 
 
 Methodology
 ==============
-The method (see `Figure 1`) will utilize 47 million OpenCelliD data points to inform 2G, 3G, 4G and 5G coverage. Income estimates for low and middle income countries will be utilized for poverty estimation at the 1 km2 level (Chi et al., 2022). Additionally, multiple hazard models will be utilized, for flooding from the World Resource Institute Aqueduct platform, and for tropical cyclones from recently developed maximum wind speed estimates. Hazard impacts will be compared for a historical scenario (1980) and compared to a worst-case (RCP8.5) representing no emissions abatement, for different event probabilities. 
+The method (see `Figure 1`) ..... 
 
 ## Method Box
 
@@ -14,7 +12,7 @@ The method (see `Figure 1`) will utilize 47 million OpenCelliD data points to in
   <img src="/docs/method.png" />
 </p>
 
-The results are based on the data for historical baseline from 1980 and the Representative Concentration Pathway 8.5 (rising carbon emissions) (RCP8.5) scenarios obtained from the World Resource Institute [1]. 
+The results are based on the data for ....
 
 ## Required Data
 [1]	“Open Spatial Demographic Data and Research,” WorldPop. https://www.worldpop.org/ (accessed May 08, 2023).
