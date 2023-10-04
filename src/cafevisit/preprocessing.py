@@ -226,14 +226,14 @@ class ProcessRegions:
     
     def process_sub_region_boundaries(self):
 
-        region_path = '../' 
+        region_path = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(2, self.country_iso3)) 
         countries = gpd.read_file(region_path)
 
         for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries'):
 
             sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
 
-            filename = '{}.shp'.format(row['GID_1'])    
+            filename = '{}.shp'.format(row['GID_2'])    
 
             folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
 
@@ -286,7 +286,6 @@ class ProcessPopulation:
         """
 
         iso3 = self.country_iso3
-        gid_region = self.gid_region
 
         filename = self.pop_tiff
         path_pop = os.path.join(filename)
@@ -320,8 +319,8 @@ class ProcessPopulation:
                         'crs': 'epsg:4326'})
         
         #now we write out at the regional level
-        filename_out = 'ppp_2020_1km_Aggregated.tif' #each regional file is named using the gid id
-        folder_out = os.path.join('results', 'processed', iso3, 'population')
+        filename_out = 'ppp_2020_1km_Aggregated.tif' 
+        folder_out = os.path.join('results', 'processed', iso3, 'population', 'national')
 
         if not os.path.exists(folder_out):
 
@@ -336,23 +335,36 @@ class ProcessPopulation:
         return print('Population processing completed for {}'.format(iso3))
     
 
-    def generate_population_csv(self):
-
+    def process_population_tif(self):
+        """
+        Process population layer.
+        
+        Parameters
+        ----------
+        data_name: string
+            Filename of the population raster layer
+        gid_level: string
+            GID boundary spatial level to process
+            
+        Returns
+        -------
+        output: dictionary.
+            Dictionary containing the country population and grid level
+        """
         gid_region = self.gid_region
         iso = self.country_iso3
 
         filename = 'regions_{}_{}.shp'.format(gid_region, iso)
         path_regions = os.path.join('results', 'processed', iso, 'regions', filename)
         rastername = 'ppp_2020_1km_Aggregated.tif'
-        path_raster = os.path.join('results', 'processed', iso, 'population', rastername)
+        path_raster = os.path.join('results', 'processed', iso, 'population', 'national', rastername)
 
         boundaries = gpd.read_file(path_regions, crs = 'epsg:4326')
+        print(boundaries.shape)
 
         output = []
         for idx, boundary in boundaries.iterrows():
-            
             print('Working on {}'.format(boundary['NAME_1']))
-            
             with rasterio.open(path_raster) as src:
                 
                 affine = src.transform
@@ -363,12 +375,13 @@ class ProcessPopulation:
                     boundary['geometry'], array, nodata = 255,
                     stats = ['sum'], affine = affine)][0]
                 output.append({
-                    'NAME_1': boundary['NAME_1'],
+                    'name': boundary['NAME_2'],
                     'GID_1': boundary[gid_region],
-                    'population': population
+                    'population': population,
+                    'geometry': boundary['geometry']
                 })
+
         df = pd.DataFrame(output)
-        df = df[['NAME_1', 'population']]
 
         fileout = '{}_population_results.csv'.format(iso)
         folder_out = os.path.join('results', 'final', iso, 'population')
@@ -378,5 +391,5 @@ class ProcessPopulation:
 
         path_out = os.path.join(folder_out, fileout)
         df.to_csv(path_out, index = False)
-        
-        return None
+
+        return output
