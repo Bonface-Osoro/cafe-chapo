@@ -360,11 +360,11 @@ class ProcessPopulation:
         path_raster = os.path.join('results', 'processed', iso, 'population', 'national', rastername)
 
         boundaries = gpd.read_file(path_regions, crs = 'epsg:4326')
-        print(boundaries.shape)
 
         output = []
+        print('Working on {}'.format(iso))
         for idx, boundary in boundaries.iterrows():
-            print('Working on {}'.format(boundary['NAME_1']))
+    
             with rasterio.open(path_raster) as src:
                 
                 affine = src.transform
