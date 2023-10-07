@@ -12,7 +12,14 @@ The method (see `Figure 1`) .....
   <img src="/docs/method.png" />
 </p>
 
-The results are based on the data for ....
+Results
+==============
+`Figure 2` shows the population distribution results by county sub-regions for Kenya.
+
+#### Figure 2 Population Distribution Results.
+<p align="center">
+  <img src="/docs/kenya_population.png" />
+</p>
 
 ## Required Data
 [1]	“Open Spatial Demographic Data and Research,” WorldPop. https://www.worldpop.org/ (accessed May 08, 2023).
