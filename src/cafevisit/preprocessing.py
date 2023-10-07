@@ -374,14 +374,27 @@ class ProcessPopulation:
                 population = [i['sum'] for i in zonal_stats(
                     boundary['geometry'], array, nodata = 255,
                     stats = ['sum'], affine = affine)][0]
+
+                #Calculate the central coordinates of each of the polygons
+                boundary['centroid'] = boundary['geometry'].centroid
+                boundary['longitude'] = boundary['centroid'].x
+                boundary['latitude'] = boundary['centroid'].y
+
                 output.append({
+                    'iso3':boundary['GID_0'],
+                    'region':boundary['NAME_1'],
                     'name': boundary['NAME_2'],
                     'GID_1': boundary[gid_region],
                     'population': population,
+                    'latitude': boundary['latitude'],
+                    'longitude': boundary['longitude'],
                     'geometry': boundary['geometry']
                 })
 
         df = pd.DataFrame(output)
+        df.dropna(subset = ['population'], inplace = True)
+        df['population'] = df['population'].astype(int)
+        df[['latitude', 'longitude']] = df[['latitude', 'longitude']].round(4)
 
         fileout = '{}_population_results.csv'.format(iso)
         folder_out = os.path.join('results', 'final', iso, 'population')
