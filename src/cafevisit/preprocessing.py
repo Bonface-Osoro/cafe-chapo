@@ -388,12 +388,14 @@ class ProcessPopulation:
                     'population': population,
                     'latitude': boundary['latitude'],
                     'longitude': boundary['longitude'],
-                    'geometry': boundary['geometry']
+                    'geometry': boundary['geometry'],
+                    'area': boundary['geometry'].area
                 })
 
         df = pd.DataFrame(output)
         df.dropna(subset = ['population'], inplace = True)
         df['population'] = df['population'].astype(int)
+        df['pop_density'] = (df['population'] / (df['area'] * 12309)).astype(int)
         df[['latitude', 'longitude']] = df[['latitude', 'longitude']].round(4)
 
         fileout = '{}_population_results.csv'.format(iso)
