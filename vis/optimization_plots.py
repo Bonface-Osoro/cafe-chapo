@@ -13,8 +13,10 @@ warnings.filterwarnings('ignore')
 CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
+DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
+path = os.path.join(DATA_RAW, 'countries.csv')
 
 def add_coordinates(df, lat = 'latitude', lng = 'longitude'):
 
@@ -73,4 +75,14 @@ def potential_sites(iso3):
 
     return None
 
-potential_sites('NGA')
+if __name__ == '__main__':
+
+    countries = pd.read_csv(path, encoding = 'latin-1')
+    for idx, country in countries.iterrows():
+
+        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        #if not country['iso3'] == 'BDI':
+            
+            continue 
+
+        potential_sites(countries['iso3'].loc[idx])
