@@ -3,7 +3,7 @@ import os
 import warnings
 import pandas as pd
 from cafevisit.preprocessing import ProcessCountry, ProcessRegions, ProcessPopulation
-from cafevisit.geodcoder import geocoding
+from cafevisit.supply_demand import SupplyDemand
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
 
@@ -22,17 +22,20 @@ countries = pd.read_csv(path, encoding = 'latin-1')
 
 for idx, country in countries.iterrows():
         
-    if not country['iso3'] == 'KEN':
+    if not country['iso3'] == 'NGA':
         
         continue 
 
     country = ProcessCountry(path, countries['iso3'].loc[idx])
-    #country.process_country_shapes()
+    country.process_country_shapes()
 
     regions = ProcessRegions(countries['iso3'].loc[idx], countries['lowest'].loc[idx])
-    #regions.process_regions()
-    #regions.process_sub_region_boundaries()
+    regions.process_regions()
+    regions.process_sub_region_boundaries()
 
     populations = ProcessPopulation(path, countries['iso3'].loc[idx], countries['lowest'].loc[idx], pop_tif_loc)
-    #populations.process_national_population()
+    populations.process_national_population()
     populations.process_population_tif()
+
+    supply_demand = SupplyDemand(countries['iso3'].loc[idx])
+    supply_demand.customer_ev_centers()
