@@ -151,7 +151,7 @@ class ProcessCountry:
         
         single_country.to_file(shape_path)
 
-        return print('National outline shapefile processing completed for {}'.format(self.country_iso3))
+        return None
 
 
 class ProcessRegions:
@@ -222,18 +222,28 @@ class ProcessRegions:
 
                 pass
 
-        return print('Regional shapefiles processing completed for {}'.format(self.country_iso3))
+        return None
     
     def process_sub_region_boundaries(self):
 
         region_path = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(2, self.country_iso3)) 
-        countries = gpd.read_file(region_path)
+        region_path_2 = os.path.join('results', 'processed', self.country_iso3, 'regions', 'regions_{}_{}.shp'.format(1, self.country_iso3))
+        
+        if os.path.exists(region_path):
+
+            countries = gpd.read_file(region_path)
+            gid = 'GID_2'
+
+        else:
+
+            countries = gpd.read_file(region_path_2)
+            gid = 'GID_1'
 
         for index, row in tqdm(countries.iterrows(), desc = 'Processing sub-region boundaries'):
 
             sub_region_shapefile = gpd.GeoDataFrame([row], crs = countries.crs)
 
-            filename = '{}.shp'.format(row['GID_2'])    
+            filename = '{}.shp'.format(row[gid])    
 
             folder_out = os.path.join('results', 'processed', self.country_iso3, 'boundaries')
 
@@ -332,7 +342,7 @@ class ProcessPopulation:
 
             dest.write(out_img)
 
-        return print('Population processing completed for {}'.format(iso3))
+        return None
     
 
     def process_population_tif(self):
@@ -362,8 +372,8 @@ class ProcessPopulation:
         boundaries = gpd.read_file(path_regions, crs = 'epsg:4326')
 
         output = []
-        print('Working on {}'.format(iso))
-        for idx, boundary in boundaries.iterrows():
+
+        for idx, boundary in tqdm(boundaries.iterrows(), desc = 'Working on {}'.format(iso)):
     
             with rasterio.open(path_raster) as src:
                 
@@ -383,7 +393,6 @@ class ProcessPopulation:
                 output.append({
                     'iso3':boundary['GID_0'],
                     'region':boundary['NAME_1'],
-                    'name': boundary['NAME_2'],
                     'GID_1': boundary[gid_region],
                     'population': population,
                     'latitude': boundary['latitude'],
