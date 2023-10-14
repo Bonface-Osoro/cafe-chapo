@@ -27,43 +27,6 @@ def add_coordinates(df, lat = 'latitude', lng = 'longitude'):
     return gpd.GeoDataFrame(df, geometry = gpd.points_from_xy(df.longitude, df.latitude))
 
 
-def get_served_customers(inpu_ev_center, iso3):
-    """
-    This function find the customer ids 
-    served by input EV service center
-
-    Parameters
-    ----------
-    inpu_ev_center : string
-        EV service center id
-    iso3 : string
-        Country iso3 to be processed.
-    
-    Returns
-    -------
-    linked_customers : list
-        List of customer's ids connected 
-        to the EV service center
-    """
-    customer = os.path.join(DATA_RESULTS, iso3, '{}_customers.csv'.format(iso3))
-    ev_centers = os.path.join(DATA_RESULTS, iso3, '{}_ev_centers.csv'.format(iso3))
-    df = pd.read_csv(customer)
-    df1 = pd.read_csv(ev_centers)
-    
-    served_customers = LpVariable.dicts(
-    'Link', [(i,j) for i in df['customer_id'] for j in df1['ev_center_id']], 0)
-    
-    linked_customers = []
-    for (k, v) in served_customers.items():
-        print(v)
-        if k[1] == inpu_ev_center and v.varValue > 0:
-            
-            linked_customers.append(k[0])
-
-
-    return linked_customers
-
-
 def potential_sites(iso3):
 
     """
@@ -101,9 +64,11 @@ def potential_sites(iso3):
             legend = True)
 
     ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
     plt.title('Customer and Potential EV Service Centers.', 
-            font = 'Calibri Light')
-    plt.legend(facecolor = 'white', title = 'Potential Sites')
+            font = 'Calibri Light', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
     plt.tight_layout()
 
     filename = '{}_potential_sites.jpg'.format(iso3)
@@ -160,9 +125,10 @@ def average_demand(iso3):
     colorbar.set_label('Annual Requests', size = 10)
     
     ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
     plt.title('Projected Annual Customer Requests.', 
             font = 'Calibri Light', fontsize = 12)
-    legend = plt.legend(facecolor = 'white', title = 'Potential Sites')
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
     
@@ -175,86 +141,44 @@ def average_demand(iso3):
     return None
 
 
-def linked_customers(iso3):
-
+def discarded_sites(iso3):
     """
-    This is a function to plot 
-    potential EV service centers 
-    and customer locations.
+    This function plots the selected 
+    and discarded warehouses.
 
     Parameters
     ----------
     iso3 : string
-        Country iso3 to be processed.
+        Country iso3 to be processed. 
     """
-
     map_path = os.path.join(DATA_PROCESSED, iso3, 'national_outline.shp')
-    path = os.path.join(DATA_RESULTS, 'final', iso3)
-
-    customer = os.path.join(DATA_RESULTS, iso3, '{}_customers.csv'.format(iso3))
     ev_center = os.path.join(DATA_RESULTS, iso3, '{}_optimized_ev_center.csv'.format(iso3))
-
-    df = pd.read_csv(customer, index_col = 0)
-    df1 = pd.read_csv(ev_center, index_col = 0)
-
-    establish = df1.loc[df1['build?'] == 'Yes'] 
+    df = pd.read_csv(ev_center)
+    df = df.rename(columns = {'build?': 'build'})
+    df = add_coordinates(df)
 
     country = gpd.read_file(map_path)
-    sns.set(font_scale = 1.5)
+    sns.set(font_scale = 0.5)
     ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
-
-    establish.plot(ax = ax, marker = 'o', c = '#0059b3', markersize = 100, label = 'EV Service Centers?')
-    
-    df.plot(ax = ax, marker = 'X', color= '#990000', markersize = 80, alpha = 0.8, label = 'Customer')
-
-    for w in establish.ev_center_id:
-        
-        connected_customers = get_served_customers(w, iso3)
-        
-        for c in connected_customers:
-            
-            ax.plot([establish.loc[establish.ev_center_id == w].longitude, df.loc[df.customer_id == c].longitude],
-            [establish.loc[establish.ev_center_id == w].latitude, df.loc[df.customer_id == c].latitude],
-            linewidth = 0.8, linestyle = '--', color = '#0059b3')
-
-    plt.title('Customer and Potential EV Service Centers.', 
-            font = 'Calibri Light')
-    plt.legend(facecolor = 'white', fontsize=30)
-
-    # Remove ticks from axis
-    plt.xticks([])
-    plt.yticks([])
-
-    # Show plot
-    plt.show()
-    '''customer_df = add_coordinates(df)
-    ev_df = add_coordinates(df1)
-
-    country = gpd.read_file(map_path)
-    sns.set(font_scale = 1.5)
-    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
-
-    customer_df.plot(ax = ax, marker = 'X', color = 'blue', 
-            markersize = 20, alpha = 0.5, label = 'Customers', legend = True)
-
-    ev_df.plot(ax = ax, marker = 'D', color = 'green', 
-            markersize = 20, alpha = 0.5, label = 'Potential EV ServiceCenters',
-            legend = True)
-
+    df.loc[df.build == 'Yes'].plot(ax = ax, marker = 'o', c = 'green', markersize = 50, label = 'Build')
+    df.loc[df.build == 'No'].plot(ax = ax, marker = 'X', c = 'red', markersize = 50, label = 'Discard')
     ax.grid(b = True, which = 'minor', alpha = 0.25)
-    plt.title('Customer and Potential EV Service Centers.', 
-            font = 'Calibri Light')
-    plt.legend(facecolor = 'white', title = 'Potential Sites')
+    ax.tick_params(labelsize = 10)
+
+    plt.title('Selected and Discarded EV Service Centers.', 
+            font = 'Calibri Light', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Decision', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
     plt.tight_layout()
 
-    filename = '{}_potential_sites.jpg'.format(iso3)
+    filename = '{}_discarded_sites.jpg'.format(iso3)
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     path_out = os.path.join(DATA_VIS, filename)
     
-    plt.savefig(path_out, dpi = 480)'''
+    plt.savefig(path_out, dpi = 480)
 
 
-    return plt.show()
+    return None
 
 
 if __name__ == '__main__':
@@ -267,6 +191,6 @@ if __name__ == '__main__':
             
             continue 
 
-        #potential_sites(countries['iso3'].loc[idx])
-        #average_demand(countries['iso3'].loc[idx])
-        linked_customers(countries['iso3'].loc[idx])
+        potential_sites(countries['iso3'].loc[idx])
+        average_demand(countries['iso3'].loc[idx])
+        discarded_sites(countries['iso3'].loc[idx])

@@ -3,6 +3,9 @@ import os
 import math
 import warnings
 import pandas as pd
+import geopandas as gpd
+import matplotlib.pyplot as plt 
+import seaborn as sns
 from math import *
 from pulp import *
 from itertools import *
@@ -14,10 +17,18 @@ CONFIG = configparser.ConfigParser()
 CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
+DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
 
 path = os.path.join(DATA_RAW, 'countries.csv')
 countries = pd.read_csv(path, encoding = 'latin-1')
+
+def add_coordinates(df, lat = 'latitude', lng = 'longitude'):
+
+    assert pd.Series([lat, lng]).isin(df.columns).all()
+
+    return gpd.GeoDataFrame(df, geometry = gpd.points_from_xy(df.longitude, df.latitude))
+
 
 def haversine_distance(lat1, lon1, lat2, lon2):
 
@@ -165,7 +176,7 @@ def linear_problem(iso3):
         served_customer = LpVariable.dicts('Link', 
                         list(product(df['customer_id'], 
                         df1['ev_center_id'])), 0)
-        
+
         #Objective Function
         annual_cost_terms = [annual_cost_dict.get(j, 0) * built_ev_center[j] for j in df1['ev_center_id']]
         transport_cost_terms = [transport_costs_dict[j][i] * served_customer[(i, j)]
@@ -211,11 +222,6 @@ def linear_problem(iso3):
                 df1.loc[df1['ev_center_id'] == i, 'build?'] = 'No'
                 df1.loc[df1['ev_center_id'] == i, 'value'] = 0
 
-        converted_dict = {str(key): value for key, value in served_customer.items()}
-        with open('served.json', 'w') as json_file:
-
-            json.dump(converted_dict, json_file)
-
         fileout = '{}_optimized_ev_center.csv'.format(iso3)
         folder_out = os.path.join(DATA_RESULTS, iso3)
         if not os.path.exists(folder_out):
@@ -224,6 +230,68 @@ def linear_problem(iso3):
 
         path_out = os.path.join(folder_out, fileout)
         df1.to_csv(path_out, index = False)
+
+        map_path = os.path.join(DATA_PROCESSED, iso3, 'national_outline.shp')
+        country = gpd.read_file(map_path)
+
+        def get_served_customers(input_warehouse):
+            """
+            This function find the customer ids 
+            served by input EV service center
+
+            Parameters
+            ----------
+            inpu_ev_center : string
+                EV service center id
+            
+            Returns
+            -------
+            linked_customers : list
+                List of customer's ids connected 
+                to the EV service center            
+            """
+            # Initialize empty list
+            linked_customers = []
+            
+            for (k, v) in served_customer.items():
+                    
+                    if k[1] == input_warehouse and v.varValue>0:
+                        
+                        linked_customers.append(k[0])
+
+            return linked_customers
+        
+        establish = df1.loc[df1['build?'] == 'Yes'] 
+        sns.set(font_scale = 0.5)
+        ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+
+        df = add_coordinates(df)
+        df.plot(ax = ax, marker = 'X', color= 'green', markersize = 30, label = 'Customer Location')
+
+        establish = add_coordinates(establish)
+        establish.plot(ax = ax, marker = 'o', c = 'red', markersize = 30, label = 'EV Service Centers')
+
+        for w in establish.ev_center_id:
+            
+            connected_customers = get_served_customers(w)
+            
+            for c in connected_customers:
+                
+                ax.plot([establish.loc[establish.ev_center_id == w].longitude, df.loc[df.customer_id == c].longitude],
+                [establish.loc[establish.ev_center_id == w].latitude, df.loc[df.customer_id == c].latitude],
+                linewidth = 0.8, linestyle = '--', color = '#0059b3')
+        
+        ax.grid(b = True, which = 'minor', alpha = 0.25)
+        ax.tick_params(labelsize = 10)
+        plt.title('Optimized Customer Requests.', font = 'Calibri Light', fontsize = 12)
+        legend = plt.legend(facecolor = 'white', title = 'Location', prop = {'size': 8})
+        legend.get_title().set_fontsize(9)
+        plt.tight_layout()
+
+        filename = '{}_optimized_sites.jpg'.format(iso3)
+        DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
+        path_out = os.path.join(DATA_VIS, filename)  
+        plt.savefig(path_out, dpi = 480)
 
     return print('Minimized cost: ', minimized_cost)
 
