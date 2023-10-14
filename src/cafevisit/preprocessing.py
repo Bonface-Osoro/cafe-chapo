@@ -411,7 +411,6 @@ class ProcessPopulation:
 
             df['capital'].loc[i] = 'admin'
 
-
         fileout = '{}_population_results.csv'.format(iso)
         folder_out = os.path.join('results', 'final', iso, 'population')
         if not os.path.exists(folder_out):
