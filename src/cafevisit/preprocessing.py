@@ -392,7 +392,7 @@ class ProcessPopulation:
 
                 output.append({
                     'iso3':boundary['GID_0'],
-                    'region':boundary['NAME_1'],
+                    'admin_name':boundary['NAME_1'],
                     'GID_1': boundary[gid_region],
                     'population': population,
                     'latitude': boundary['latitude'],
@@ -406,6 +406,11 @@ class ProcessPopulation:
         df['population'] = df['population'].astype(int)
         df['pop_density'] = (df['population'] / (df['area'] * 12309)).astype(int)
         df[['latitude', 'longitude']] = df[['latitude', 'longitude']].round(4)
+        df['capital'] = ''
+        for i in range(len(df)):
+
+            df['capital'].loc[i] = 'admin'
+
 
         fileout = '{}_population_results.csv'.format(iso)
         folder_out = os.path.join('results', 'final', iso, 'population')
