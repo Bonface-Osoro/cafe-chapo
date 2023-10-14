@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 import seaborn as sns
 from shapely import wkt
+from pulp import *
+from itertools import *
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 pd.options.mode.chained_assignment = None
 warnings.filterwarnings('ignore')
@@ -23,6 +25,7 @@ def add_coordinates(df, lat = 'latitude', lng = 'longitude'):
     assert pd.Series([lat, lng]).isin(df.columns).all()
 
     return gpd.GeoDataFrame(df, geometry = gpd.points_from_xy(df.longitude, df.latitude))
+
 
 def potential_sites(iso3):
 
@@ -61,9 +64,11 @@ def potential_sites(iso3):
             legend = True)
 
     ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
     plt.title('Customer and Potential EV Service Centers.', 
-            font = 'Calibri Light')
-    plt.legend(facecolor = 'white', title = 'Potential Sites')
+            font = 'Calibri Light', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
     plt.tight_layout()
 
     filename = '{}_potential_sites.jpg'.format(iso3)
@@ -75,14 +80,117 @@ def potential_sites(iso3):
 
     return None
 
+
+def average_demand(iso3):
+
+    """
+    This functions filters and 
+    groups the regions of the 
+    country by calculating regional 
+    demand and mean latitude and 
+    longitude.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country iso3 to be processed. 
+    """
+    map_path = os.path.join(DATA_PROCESSED, iso3, 'national_outline.shp')
+    path = os.path.join(DATA_RESULTS, 'final', iso3)
+
+    region = os.path.join(DATA_RESULTS, iso3, '{}_region.csv'.format(iso3))
+
+    country = gpd.read_file(map_path)
+
+    df = pd.read_csv(region)
+    region_df = add_coordinates(df)
+
+    sns.set(font_scale = 0.5)
+    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+    region_df.plot(ax = ax, column = 'demand', marker = 'o', c = 'demand', 
+                   cmap = 'Paired', markersize = 1000, alpha = 0.6)
+    
+    region_df.plot(ax = ax, marker = 'o', c = 'green', markersize = 15, 
+                   alpha = 0.8, label = 'Customer Location')
+    
+    for i, row in region_df.iterrows():
+
+        plt.annotate(row.admin_name, xy = (row.longitude, 
+                                       row.latitude + 0.2), horizontalalignment = 'center')
+        
+    colorbar = plt.colorbar(ax.get_children()[1], ax = ax, label = 'Annual Requests', 
+                 fraction = 0.04, pad = 0.03, orientation = 'horizontal') 
+    colorbar.ax.get_yaxis().label.set_fontsize(8) 
+    colorbar.ax.tick_params(labelsize = 8)
+    colorbar.set_label('Annual Requests', size = 10)
+    
+    ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
+    plt.title('Projected Annual Customer Requests.', 
+            font = 'Calibri Light', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
+    plt.tight_layout()
+    
+    filename = '{}_annual_requests.jpg'.format(iso3)
+    DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
+    path_out = os.path.join(DATA_VIS, filename)
+
+    plt.savefig(path_out, dpi = 480)
+
+    return None
+
+
+def discarded_sites(iso3):
+    """
+    This function plots the selected 
+    and discarded warehouses.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country iso3 to be processed. 
+    """
+    map_path = os.path.join(DATA_PROCESSED, iso3, 'national_outline.shp')
+    ev_center = os.path.join(DATA_RESULTS, iso3, '{}_optimized_ev_center.csv'.format(iso3))
+    df = pd.read_csv(ev_center)
+    df = df.rename(columns = {'build?': 'build'})
+    df = add_coordinates(df)
+
+    country = gpd.read_file(map_path)
+    sns.set(font_scale = 0.5)
+    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+    df.loc[df.build == 'Yes'].plot(ax = ax, marker = 'o', c = 'green', markersize = 50, label = 'Build')
+    df.loc[df.build == 'No'].plot(ax = ax, marker = 'X', c = 'red', markersize = 50, label = 'Discard')
+    ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
+
+    plt.title('Selected and Discarded EV Service Centers.', 
+            font = 'Calibri Light', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Decision', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
+    plt.tight_layout()
+
+    filename = '{}_discarded_sites.jpg'.format(iso3)
+    DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
+    path_out = os.path.join(DATA_VIS, filename)
+    
+    plt.savefig(path_out, dpi = 480)
+
+
+    return None
+
+
 if __name__ == '__main__':
 
     countries = pd.read_csv(path, encoding = 'latin-1')
     for idx, country in countries.iterrows():
 
-        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        #if not country['iso3'] == 'BDI':
+        #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        if not country['iso3'] == 'KEN':
             
             continue 
 
         potential_sites(countries['iso3'].loc[idx])
+        average_demand(countries['iso3'].loc[idx])
+        discarded_sites(countries['iso3'].loc[idx])
