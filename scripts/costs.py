@@ -167,6 +167,7 @@ def linear_problem(iso3):
             # Final dictionary with all costs for all EV service centers
             transport_costs_dict.update({df1.ev_center_id[i]: warehouse_transport_costs_dict})
 
+        print('Performing spatial optimization for {}'.format(iso3))
         lp_problem = LpProblem('CFLP', LpMinimize)
 
         #Build or do not built EV service center at location j (cj)
@@ -206,7 +207,9 @@ def linear_problem(iso3):
 
                     lp_problem += served_customer[(i,j)] <= demand_dict[i] * built_ev_center[j]
         
-        lp_problem.solve()
+        solver = pulp.PULP_CBC_CMD(msg=False)
+        lp_problem.solve(solver)
+
         minimized_cost = round(value(lp_problem.objective), 2)
 
         #Store the number of EV service centers built
@@ -234,6 +237,7 @@ def linear_problem(iso3):
         map_path = os.path.join(DATA_PROCESSED, iso3, 'national_outline.shp')
         country = gpd.read_file(map_path)
 
+        print('Plotting optimization results for {}'.format(iso3))
         def get_served_customers(input_warehouse):
             """
             This function find the customer ids 
@@ -283,7 +287,7 @@ def linear_problem(iso3):
         
         ax.grid(b = True, which = 'minor', alpha = 0.25)
         ax.tick_params(labelsize = 10)
-        plt.title('Optimized Customer Requests.', font = 'Calibri Light', fontsize = 12)
+        plt.title('Optimized EV Service Center Locations.', font = 'Calibri Light', fontsize = 12)
         legend = plt.legend(facecolor = 'white', title = 'Location', prop = {'size': 8})
         legend.get_title().set_fontsize(9)
         plt.tight_layout()
@@ -293,7 +297,10 @@ def linear_problem(iso3):
         path_out = os.path.join(DATA_VIS, filename)  
         plt.savefig(path_out, dpi = 480)
 
-    return print('Minimized cost: ', minimized_cost)
+    status = LpStatus[lp_problem.status]
+
+
+    return print('Solution is', status, ' and minimized cost = ', minimized_cost)
 
 
 if __name__ == '__main__':
