@@ -96,5 +96,5 @@ if __name__ == '__main__':
             
             continue 
 
-        pop_density(countries['iso3'].loc[idx]) 
-    #ssa_pop_density()           
+        #pop_density(countries['iso3'].loc[idx]) 
+    ssa_pop_density()           
