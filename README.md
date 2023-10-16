@@ -16,7 +16,7 @@ Results
 ==============
 `Figure 2` shows the population distribution results by country sub-regions for Sub-Saharan Africa.
 
-#### Figure 2 Population Distribution Results.
+#### Figure 2 Population Distribution Results of Sub-Saharan Africa.
 <p align="center">
   <img src="/docs/SSA_population.png" />
 </p>

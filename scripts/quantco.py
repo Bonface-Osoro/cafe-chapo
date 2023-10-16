@@ -210,8 +210,8 @@ if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
 
-        #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'BEN':
+        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        #if not country['iso3'] == 'BEN':
             
             continue 
 
@@ -219,5 +219,5 @@ if __name__ == '__main__':
         #csv_merger('_ev_centers.csv', countries['iso3'].loc[idx])
         #csv_merger('_optimized_ev_center.csv', countries['iso3'].loc[idx])
         #csv_merger('_region.csv', countries['iso3'].loc[idx])
-        #pop_csv_merger(countries['iso3'].loc[idx])
-        generate_ssa_shapefile(countries['iso3'].loc[idx])
+        pop_csv_merger(countries['iso3'].loc[idx])
+        #generate_ssa_shapefile(countries['iso3'].loc[idx])
