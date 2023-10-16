@@ -207,7 +207,7 @@ def linear_problem(iso3):
 
                     lp_problem += served_customer[(i,j)] <= demand_dict[i] * built_ev_center[j]
         
-        solver = pulp.PULP_CBC_CMD(msg=False)
+        solver = pulp.PULP_CBC_CMD(msg = False)
         lp_problem.solve(solver)
 
         minimized_cost = round(value(lp_problem.objective), 2)
@@ -287,7 +287,7 @@ def linear_problem(iso3):
         
         ax.grid(b = True, which = 'minor', alpha = 0.25)
         ax.tick_params(labelsize = 10)
-        plt.title('Optimized EV Service Center Locations.', font = 'Calibri Light', fontsize = 12)
+        plt.title('Optimized EV Service Center Locations.', font = 'DejaVu Sans', fontsize = 12)
         legend = plt.legend(facecolor = 'white', title = 'Location', prop = {'size': 8})
         legend.get_title().set_fontsize(9)
         plt.tight_layout()
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     for idx, country in countries.iterrows():
 
         #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'KEN':
+        if not country['iso3'] == 'ERI':
             
             continue 
 

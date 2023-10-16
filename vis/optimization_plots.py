@@ -5,7 +5,6 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import geopandas as gpd
 import seaborn as sns
-from shapely import wkt
 from pulp import *
 from itertools import *
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -17,6 +16,7 @@ CONFIG.read(os.path.join(os.path.dirname(__file__), 'script_config.ini'))
 BASE_PATH = CONFIG['file_locations']['base_path']
 DATA_RAW = os.path.join(BASE_PATH, 'raw')
 DATA_RESULTS = os.path.join(BASE_PATH, '..', 'results', 'final')
+DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 'SSA')
 DATA_PROCESSED = os.path.join(BASE_PATH, '..', 'results', 'processed')
 path = os.path.join(DATA_RAW, 'countries.csv')
 
@@ -66,7 +66,7 @@ def potential_sites(iso3):
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
     plt.title('Customer and Potential EV Service Centers.', 
-            font = 'Calibri Light', fontsize = 12)
+            font = 'DejaVu Sans', fontsize = 12)
     legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
@@ -127,7 +127,7 @@ def average_demand(iso3):
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
     plt.title('Projected Annual Customer Requests.', 
-            font = 'Calibri Light', fontsize = 12)
+            font = 'DejaVu Sans', fontsize = 12)
     legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
@@ -166,7 +166,7 @@ def discarded_sites(iso3):
     ax.tick_params(labelsize = 10)
 
     plt.title('Selected and Discarded EV Service Centers.', 
-            font = 'Calibri Light', fontsize = 12)
+            font = 'DejaVu Sans', fontsize = 12)
     legend = plt.legend(facecolor = 'white', title = 'Decision', prop = {'size': 8})
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
@@ -181,16 +181,164 @@ def discarded_sites(iso3):
     return None
 
 
+def ssa_sites():
+
+    """
+    This is a function to plot 
+    potential EV service centers 
+    and customer locations in
+    Sub-Saharan Africa.
+    """
+
+    map_path = os.path.join(DATA_AFRICA, 'shapefile', 'Africa_Boundaries.shp')
+    path = os.path.join(DATA_AFRICA)
+
+    customer = os.path.join(DATA_AFRICA, 'SSA_customers.csv')
+    ev_center = os.path.join(DATA_AFRICA, 'SSA_ev_centers.csv')
+
+    df = pd.read_csv(customer)
+    df1 = pd.read_csv(ev_center)
+
+    customer_df = add_coordinates(df)
+    ev_df = add_coordinates(df1)
+
+    country = gpd.read_file(map_path)
+    sns.set(font_scale = 1.5)
+    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+
+    customer_df.plot(ax = ax, marker = 'X', color = 'blue', 
+            markersize = 1, alpha = 0.5, label = 'Customers', legend = True)
+
+    ev_df.plot(ax = ax, marker = 'D', color = 'green', 
+            markersize = 1, alpha = 0.5, label = 'Potential EV ServiceCenters',
+            legend = True)
+
+    ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
+    plt.title('Customer and Potential EV Service Centers.', 
+            font = 'DejaVu Sans', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
+    plt.tight_layout()
+
+    filename = 'SSA_potential_sites.jpg'
+    DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
+    path_out = os.path.join(DATA_VIS, filename)
+    
+    plt.savefig(path_out, dpi = 480)
+
+
+    return None
+
+
+def ssa_demand():
+
+    """
+    This functions filters and 
+    groups the regions of Sub-
+    Saharan Africa by calculating 
+    regional demand and mean 
+    latitude and longitude. 
+    """
+    map_path = map_path = os.path.join(DATA_AFRICA, 'shapefile', 'Africa_Boundaries.shp')
+
+    region = os.path.join(DATA_AFRICA, 'SSA_region.csv')
+    country = gpd.read_file(map_path)
+
+    df = pd.read_csv(region)
+    region_df = add_coordinates(df)
+
+    sns.set(font_scale = 0.5)
+    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+    region_df.plot(ax = ax, column = 'demand', marker = 'o', c = 'demand', 
+                   cmap = 'Paired', markersize = 500, alpha = 0.6)
+    
+    region_df.plot(ax = ax, marker = 'o', c = 'green', markersize = 0.05, 
+                   alpha = 0.8, label = 'Customer Location')
+    
+    for i, row in region_df.iterrows():
+
+        plt.annotate(row.admin_name, xy = (row.longitude, 
+                                       row.latitude + 0.2), horizontalalignment = 'center')
+        
+    colorbar = plt.colorbar(ax.get_children()[1], ax = ax, label = 'Annual Requests', 
+                 fraction = 0.04, pad = 0.03, orientation = 'horizontal') 
+    colorbar.ax.get_yaxis().label.set_fontsize(8) 
+    colorbar.ax.tick_params(labelsize = 8)
+    colorbar.set_label('Annual Requests', size = 10)
+    
+    ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
+    plt.title('Projected Annual Customer Requests.', 
+            font = 'DejaVu Sans', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
+    plt.tight_layout()
+    
+    filename = 'SSA_annual_requests.jpg'
+    DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
+    path_out = os.path.join(DATA_VIS, filename)
+
+    plt.savefig(path_out, dpi = 480)
+
+
+    return None
+
+
+def discarded_ssa_sites():
+    """
+    This function plots the selected 
+    and discarded warehouses.
+
+    Parameters
+    ----------
+    iso3 : string
+        Country iso3 to be processed. 
+    """
+    map_path = os.path.join(DATA_AFRICA, 'shapefile', 'Africa_Boundaries.shp')
+    ev_center = os.path.join(DATA_AFRICA, 'SSA_optimized_ev_center.csv')
+    df = pd.read_csv(ev_center)
+    df = df.rename(columns = {'build?': 'build'})
+    df = add_coordinates(df)
+
+    country = gpd.read_file(map_path)
+    sns.set(font_scale = 0.5)
+    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+    df.loc[df.build == 'Yes'].plot(ax = ax, marker = 'o', c = 'green', markersize = 1, label = 'Build')
+    df.loc[df.build == 'No'].plot(ax = ax, marker = 'X', c = 'red', markersize = 1, label = 'Discard')
+    ax.grid(b = True, which = 'minor', alpha = 0.25)
+    ax.tick_params(labelsize = 10)
+
+    plt.title('Selected and Discarded EV Service Centers.', 
+            font = 'DejaVu Sans', fontsize = 12)
+    legend = plt.legend(facecolor = 'white', title = 'Decision', prop = {'size': 8})
+    legend.get_title().set_fontsize(9)
+    plt.tight_layout()
+
+    filename = 'SSA_discarded_sites.jpg'
+    DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
+    path_out = os.path.join(DATA_VIS, filename)
+    
+    plt.savefig(path_out, dpi = 480)
+
+
+    return None
+
+
 if __name__ == '__main__':
 
     countries = pd.read_csv(path, encoding = 'latin-1')
     for idx, country in countries.iterrows():
 
-        #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'KEN':
+        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        #if not country['iso3'] == 'KEN':
             
             continue 
 
-        potential_sites(countries['iso3'].loc[idx])
-        average_demand(countries['iso3'].loc[idx])
-        discarded_sites(countries['iso3'].loc[idx])
+        #potential_sites(countries['iso3'].loc[idx])
+       # average_demand(countries['iso3'].loc[idx])
+        #discarded_sites(countries['iso3'].loc[idx])
+
+    ssa_sites()
+    ssa_demand()
+    discarded_ssa_sites()
