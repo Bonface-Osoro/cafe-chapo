@@ -1,5 +1,5 @@
 # Capacitated Facility Location Model for Electric Vehicle Service Centers (cafe-visit)
-According to the International Energy Agency, the electric car sales in 2022 exceeded 10 million indicating that it has tripled in the last three years. This number is expected to grow especially at the backdrop of policies and efforts to decarbonize. However, the switch to electric vehicles will require extensive supporting infrastructure such as servicing centers and charging point for countries that are yet to adopt them. Although the electric vehicles are not made out of a completely new technology, servicing them will require new set of skills that may be lacking among conventional mechanics and technicians in developing world. Therefore, it is important for the distributors and sellers of EV to setup regional service centers for repairs, training and retraining of the car users. Setting such a center requires initial capital investment as well as ensuring that it is located in an optimal position where it serves the needs of the nearby car owners. To this end, this work seeks to develop a model for determining the optimal number and location of EV service centers in Kenya. The model will account for the cost of reaching the service center as well as the fixed construction cost. A hypothetical cost of taxes, electricity, rent and maintenance will be included as fixed costs. The number of potential car owners will be obtained from population satellite raster layers and calculated as a percentage of the total population. Therefore, the paper will determine the number and location of service centers that meet the customers demand while reducing the access and fixed costs. 
+According to the International Energy Agency, the electric car sales in 2022 exceeded 10 million indicating that it has tripled in the last three years. This number is expected to grow especially at the backdrop of policies and efforts to decarbonize road transportation sector. However, the switch to electric vehicles will require extensive supporting infrastructure such as servicing centers and charging points for countries that are yet to adopt them. Although the electric vehicles are not made out of a completely new technology, servicing them will require new set of skills that may be lacking among conventional mechanics and technicians in developing world. Therefore, it is important for the distributors and sellers of EV to setup regional service centers for repairs, training and retraining of the car technicians and even sale of spare parts. Setting such a center requires initial capital investment as well as ensuring that it is located in an optimal position where it serves the needs of the nearby car owners. To this end, this work seeks to develop a model for determining the optimal number and location of EV service centers in Sub-Saharan Africa (SSA). The model will account for the cost of reaching the service center as well as the fixed construction cost. A hypothetical cost of taxes, electricity, rent and maintenance will be included as fixed costs. The number of potential car owners will be obtained from population satellite raster layers and calculated as a percentage of the total population. Therefore, the paper will determine the number and location of service centers that meet the customers demand while reducing the access and fixed costs. 
 
 Methodology
 ==============
@@ -14,11 +14,11 @@ The method (see `Figure 1`) .....
 
 Results
 ==============
-`Figure 2` shows the population distribution results by county sub-regions for Kenya.
+`Figure 2` shows the population distribution results by country sub-regions for Sub-Saharan Africa.
 
 #### Figure 2 Population Distribution Results.
 <p align="center">
-  <img src="/docs/kenya_population.png" />
+  <img src="/docs/SSA_population.png" />
 </p>
 
 ## Required Data
