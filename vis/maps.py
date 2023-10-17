@@ -78,7 +78,7 @@ def ssa_pop_density():
     gdf.plot(column = 'population', legend = True,
             cax = cax, ax = ax,
             legend_kwds = {'label': 'Population', 'orientation': 'horizontal'})
-    ax.set_title('Population Distribution')
+    ax.set_title('Population Distribution of Sub-Saharan Africa')
 
     fig_path = os.path.join(DATA_VIS, 'figures', 'SSA_population.png')
     plt.savefig(fig_path, dpi = 720)
