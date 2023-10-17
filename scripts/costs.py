@@ -211,19 +211,21 @@ def linear_problem(iso3):
         lp_problem.solve(solver)
 
         minimized_cost = round(value(lp_problem.objective), 2)
-
+        df1['minimized_cost'] = ''
         #Store the number of EV service centers built
         for i in df1['ev_center_id']:
 
             if built_ev_center[i].varValue == 1:
 
-                df1.loc[df1['ev_center_id'] == i, 'build?'] = 'Yes'
+                df1.loc[df1['ev_center_id'] == i, 'build'] = 'Yes'
                 df1.loc[df1['ev_center_id'] == i, 'value'] = 1
+                df1.loc[df1['ev_center_id'] == i, 'minimized_cost'] = minimized_cost
             
             else:
 
-                df1.loc[df1['ev_center_id'] == i, 'build?'] = 'No'
+                df1.loc[df1['ev_center_id'] == i, 'build'] = 'No'
                 df1.loc[df1['ev_center_id'] == i, 'value'] = 0
+                df1.loc[df1['ev_center_id'] == i, 'minimized_cost'] = 0
 
         fileout = '{}_optimized_ev_center.csv'.format(iso3)
         folder_out = os.path.join(DATA_RESULTS, iso3)
@@ -265,7 +267,7 @@ def linear_problem(iso3):
 
             return linked_customers
         
-        establish = df1.loc[df1['build?'] == 'Yes'] 
+        establish = df1.loc[df1['build'] == 'Yes'] 
         sns.set(font_scale = 0.5)
         ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
 
@@ -287,12 +289,12 @@ def linear_problem(iso3):
         
         ax.grid(b = True, which = 'minor', alpha = 0.25)
         ax.tick_params(labelsize = 10)
-        plt.title('Optimized EV Service Center Locations.', font = 'DejaVu Sans', fontsize = 12)
+        plt.title('Optimized EV Service Center Locations', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
         legend = plt.legend(facecolor = 'white', title = 'Location', prop = {'size': 8})
         legend.get_title().set_fontsize(9)
         plt.tight_layout()
 
-        filename = '{}_optimized_sites.jpg'.format(iso3)
+        filename = '{}_optimized_sites.png'.format(iso3)
         DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
         path_out = os.path.join(DATA_VIS, filename)  
         plt.savefig(path_out, dpi = 480)
@@ -307,8 +309,8 @@ if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
 
-        #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'ERI':
+        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        #if not country['iso3'] == 'MWI':
             
             continue 
 

@@ -5,6 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt 
 import geopandas as gpd
 import seaborn as sns
+from shapely import wkt
 from pulp import *
 from itertools import *
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -65,13 +66,12 @@ def potential_sites(iso3):
 
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
-    plt.title('Customer and Potential EV Service Centers.', 
-            font = 'DejaVu Sans', fontsize = 12)
+    plt.title('Cameroon', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
     legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
 
-    filename = '{}_potential_sites.jpg'.format(iso3)
+    filename = '{}_potential_sites.png'.format(iso3)
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     path_out = os.path.join(DATA_VIS, filename)
     
@@ -126,13 +126,12 @@ def average_demand(iso3):
     
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
-    plt.title('Projected Annual Customer Requests.', 
-            font = 'DejaVu Sans', fontsize = 12)
+    plt.title('Ghana', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
     legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
     
-    filename = '{}_annual_requests.jpg'.format(iso3)
+    filename = '{}_annual_requests.png'.format(iso3)
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     path_out = os.path.join(DATA_VIS, filename)
 
@@ -165,13 +164,12 @@ def discarded_sites(iso3):
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
 
-    plt.title('Selected and Discarded EV Service Centers.', 
-            font = 'DejaVu Sans', fontsize = 12)
+    plt.title('Cameroon', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
     legend = plt.legend(facecolor = 'white', title = 'Decision', prop = {'size': 8})
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
 
-    filename = '{}_discarded_sites.jpg'.format(iso3)
+    filename = '{}_discarded_sites.png'.format(iso3)
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     path_out = os.path.join(DATA_VIS, filename)
     
@@ -285,6 +283,37 @@ def ssa_demand():
     return None
 
 
+def ssa_demand_choropleth():
+    """
+    This function plots the population 
+    distribution of Sub-Saharan Africa
+    """
+    map_path = os.path.join(DATA_AFRICA, 'shapefile', 'sub_saharan_africa.shp')
+    path = os.path.join(DATA_AFRICA, 'SSA_region.csv')
+
+    map_df = gpd.read_file(map_path)
+    df = pd.read_csv(path)
+
+    df_merged  = map_df.merge(df, left_on = 'GID_1', right_on = 'GID_1')
+    gdf = gpd.GeoDataFrame(df_merged)
+    gdf.set_geometry(col = 'geometry', inplace = True)
+
+    fig, ax = plt.subplots(1, figsize = (10, 10))
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes('bottom', size = '5%', pad = 0.3)
+    gdf.plot(column = 'demand', legend = True,
+            cax = cax, ax = ax,
+            legend_kwds = {'label': 'Annual Requests', 'orientation': 'horizontal'})
+    ax.set_title('Average Sub-Regional Annual Requests')
+
+    DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
+    fig_path = os.path.join(DATA_VIS, 'SSA_avg_demand.png')
+    plt.savefig(fig_path, dpi = 720)
+
+
+    return None
+
+
 def discarded_ssa_sites():
     """
     This function plots the selected 
@@ -330,15 +359,16 @@ if __name__ == '__main__':
     countries = pd.read_csv(path, encoding = 'latin-1')
     for idx, country in countries.iterrows():
 
-        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        #if not country['iso3'] == 'KEN':
+        #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        if not country['iso3'] == 'CMR':
             
             continue 
 
-        #potential_sites(countries['iso3'].loc[idx])
-       # average_demand(countries['iso3'].loc[idx])
+        potential_sites(countries['iso3'].loc[idx])
+        #average_demand(countries['iso3'].loc[idx])
         #discarded_sites(countries['iso3'].loc[idx])
 
-    ssa_sites()
-    ssa_demand()
-    discarded_ssa_sites()
+    #ssa_sites()
+    #ssa_demand()
+    #discarded_ssa_sites()
+    #ssa_demand_choropleth()

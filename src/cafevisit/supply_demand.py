@@ -60,7 +60,7 @@ class SupplyDemand:
             
             customer_df['customer_id'] = range(1, 1 + customer_df.shape[0])
             
-            region_df = df.loc[df.admin_name.isin(region_list)].groupby(['admin_name']).agg(
+            region_df = df.loc[df.admin_name.isin(region_list)].groupby(['GID_1', 'admin_name']).agg(
                 {'latitude': 'mean', 'longitude': 'mean', 'demand': 'sum'}).reset_index()
 
             ev_name = '{}_ev_centers.csv'.format(self.country_iso3)
