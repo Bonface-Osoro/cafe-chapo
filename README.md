@@ -14,11 +14,18 @@ The method (see `Figure 1`) .....
 
 Results
 ==============
-`Figure 2` shows the population distribution results by country sub-regions for Sub-Saharan Africa.
+`Figure 2` shows the potential annual customer care EV service requests by country sub-regions for Kenya, Mozambique, Cameroon and Ghana.
 
-#### Figure 2 Population Distribution Results of Sub-Saharan Africa.
+#### Figure 2 Projected Customer Demand Across four Sub-Saharan Africa Countries.
 <p align="center">
-  <img src="/docs/SSA_population.png" />
+  <img src="/docs/Combined_demand_maps.png" />
+</p>
+
+`Figure 3` shows the optimized EV service center locations by country sub-regions for Kenya, Mozambique, Cameroon and Ghana.
+
+#### Figure 3 Optimized EV Service Center Locations for four Sub-Saharan Africa Countries.
+<p align="center">
+  <img src="/docs/Combined_optimized_maps.png" />
 </p>
 
 ## Required Data
