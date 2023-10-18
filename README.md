@@ -7,7 +7,7 @@ The method (see `Figure 1`) .....
 
 ## Method Box
 
-#### Figure 1 Proposed Method.
+#### Figure 1 Proposed Optimization Method.
 <p align="center">
   <img src="/docs/method.png" />
 </p>
