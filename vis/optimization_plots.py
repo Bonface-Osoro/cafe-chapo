@@ -66,9 +66,9 @@ def potential_sites(iso3):
 
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
-    plt.title('Cameroon', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
-    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
-    legend.get_title().set_fontsize(9)
+    plt.title('Mozambique', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 20, 'fontweight': 'bold'})
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 15}, loc = 'upper right')
+    legend.get_title().set_fontsize(17)
     plt.tight_layout()
 
     filename = '{}_potential_sites.png'.format(iso3)
@@ -126,9 +126,9 @@ def average_demand(iso3):
     
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
-    plt.title('Ghana', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
-    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
-    legend.get_title().set_fontsize(9)
+    plt.title('Mozambique', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 20, 'fontweight': 'bold'})
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 15}, loc = 'upper right')
+    legend.get_title().set_fontsize(17)
     plt.tight_layout()
     
     filename = '{}_annual_requests.png'.format(iso3)
@@ -164,9 +164,9 @@ def discarded_sites(iso3):
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
 
-    plt.title('Cameroon', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
-    legend = plt.legend(facecolor = 'white', title = 'Decision', prop = {'size': 8})
-    legend.get_title().set_fontsize(9)
+    plt.title('Mozambique', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 20, 'fontweight': 'bold'})
+    legend = plt.legend(facecolor = 'white', title = 'Decision', prop = {'size': 15}, loc = 'upper right')
+    legend.get_title().set_fontsize(17)
     plt.tight_layout()
 
     filename = '{}_discarded_sites.png'.format(iso3)
@@ -360,13 +360,13 @@ if __name__ == '__main__':
     for idx, country in countries.iterrows():
 
         #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'CMR':
+        if not country['iso3'] == 'MOZ':
             
             continue 
 
         potential_sites(countries['iso3'].loc[idx])
-        #average_demand(countries['iso3'].loc[idx])
-        #discarded_sites(countries['iso3'].loc[idx])
+        average_demand(countries['iso3'].loc[idx])
+        discarded_sites(countries['iso3'].loc[idx])
 
     #ssa_sites()
     #ssa_demand()

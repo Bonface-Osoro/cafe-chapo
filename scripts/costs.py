@@ -147,7 +147,8 @@ def linear_problem(iso3):
 
         #Create a dictionary to store the customer id and the corresponding requests
         demand_dict = { customer : df['demand'][i] for i, customer in enumerate(df['customer_id'])} 
-
+        
+        df1['distance'] = 0
         transport_costs_dict = {}
         for i in range(0, df1.shape[0]):
             
@@ -163,12 +164,14 @@ def linear_problem(iso3):
                 
                 # Update costs for EV service center i
                 warehouse_transport_costs_dict.update({df.customer_id[j]: access_cost(d)})
+                df1.at[i, 'distance'] = d
             
             # Final dictionary with all costs for all EV service centers
             transport_costs_dict.update({df1.ev_center_id[i]: warehouse_transport_costs_dict})
 
         print('Performing spatial optimization for {}'.format(iso3))
-        lp_problem = LpProblem('CFLP', LpMinimize)
+      
+        lp_problem = LpProblem('CFLP', LpMinimize) 
 
         #Build or do not built EV service center at location j (cj)
         built_ev_center = LpVariable.dicts('build_ev_center', df1['ev_center_id'], 0, 1, LpBinary)
@@ -211,7 +214,7 @@ def linear_problem(iso3):
         lp_problem.solve(solver)
 
         minimized_cost = round(value(lp_problem.objective), 2)
-        df1['minimized_cost'] = ''
+        df1[ 'minimized_cost'] = ''
         #Store the number of EV service centers built
         for i in df1['ev_center_id']:
 
@@ -289,9 +292,9 @@ def linear_problem(iso3):
         
         ax.grid(b = True, which = 'minor', alpha = 0.25)
         ax.tick_params(labelsize = 10)
-        plt.title('Optimized EV Service Center Locations', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 12, 'fontweight': 'bold'})
-        legend = plt.legend(facecolor = 'white', title = 'Location', prop = {'size': 8})
-        legend.get_title().set_fontsize(9)
+        plt.title('Kenya', fontdict={'fontname': 'DejaVu Sans', 'fontsize': 20, 'fontweight': 'bold'})
+        legend = plt.legend(facecolor = 'white', title = 'Location', prop = {'size': 15}, loc = 'upper right')
+        legend.get_title().set_fontsize(17)
         plt.tight_layout()
 
         filename = '{}_optimized_sites.png'.format(iso3)
@@ -309,8 +312,8 @@ if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
 
-        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        #if not country['iso3'] == 'MWI':
+        #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        if not country['iso3'] == 'KEN':
             
             continue 
 
