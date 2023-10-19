@@ -18,7 +18,7 @@ Results
 
 #### Figure 2 Projected Customer Demand Across four Sub-Saharan Africa Countries.
 <p align="center">
-  <img src="/docs/Combined_demand_maps.png" />
+  <img src="/docs/Combined_SSA_sites_maps.png" />
 </p>
 
 `Figure 3` shows the optimized EV service center locations by country sub-regions for Kenya, Mozambique, Cameroon and Ghana.

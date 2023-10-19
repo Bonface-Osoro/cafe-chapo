@@ -4,6 +4,7 @@ import warnings
 import pandas as pd
 import matplotlib.pyplot as plt 
 import geopandas as gpd
+import seaborn as sns
 from shapely import wkt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 pd.options.mode.chained_assignment = None
@@ -72,14 +73,15 @@ def ssa_pop_density():
     gdf['geometry'] = gdf['geometry'].apply(wkt.loads)
     gdf.set_geometry(col = 'geometry', inplace = True)
 
-    fig, ax = plt.subplots(1, figsize = (10, 10))
+    sns.set(font_scale = 1.5)
+    fig, ax = plt.subplots(1, figsize = (15, 10))
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('bottom', size = '5%', pad = 0.3)
     gdf.plot(column = 'population', legend = True,
-            cax = cax, ax = ax,
+            cax = cax, ax = ax, edgecolor = 'none',
             legend_kwds = {'label': 'Population', 'orientation': 'horizontal'})
-    ax.set_title('Population Distribution of Sub-Saharan Africa')
-
+    ax.set_title('Population Distribution of Sub-Saharan Africa', fontsize = 20)
+    plt.tight_layout()
     fig_path = os.path.join(DATA_VIS, 'figures', 'SSA_population.png')
     plt.savefig(fig_path, dpi = 720)
 

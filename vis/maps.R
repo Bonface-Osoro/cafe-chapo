@@ -30,7 +30,7 @@ built_sites <-
   geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
   geom_text(
     aes(label = total, digits = 3, format = "fg", flag = "#"),
-    size = 1.8,
+    size = 3,
     position = position_dodge(0.9),
     vjust = 0.5,
     hjust = -0.1,
@@ -46,15 +46,15 @@ built_sites <-
   scale_fill_brewer(palette = "Set2") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 5),
+    axis.text.x = element_text(size = 8),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
     plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 7),
-    axis.title.y = element_text(size = 7),
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
     legend.title = element_text(size = 6),
-    legend.text = element_text(size = 5),
-    axis.title.x = element_text(size = 8)
+    legend.text = element_text(size = 8),
+    axis.title.x = element_text(size = 9)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Decision')) +
@@ -63,7 +63,7 @@ built_sites <-
     expand = c(0, 0),
     labels = function(y)
       format(y, scientific = FALSE),
-    limits = c(0, 204)
+    limits = c(0, 212)
   ) 
 
 ##########################################
@@ -79,7 +79,7 @@ minimized_average_cost <-
            fill = c("#66CC99", "#33CCCC", "#FF9966", "#FFFFCC")) +
   geom_text(
     aes(label = round(ssa_mean/1e6, 2), digits = 3, format = "fg", flag = "#"),
-    size = 1.8,
+    size = 2.5,
     position = position_dodge(0.9),
     vjust = 0.5,
     hjust = -0.1,
@@ -95,15 +95,15 @@ minimized_average_cost <-
   scale_fill_brewer(palette = "Paired") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 5),
+    axis.text.x = element_text(size = 8),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
     plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 7),
-    axis.title.y = element_text(size = 7),
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
     legend.title = element_text(size = 6),
-    legend.text = element_text(size = 5),
-    axis.title.x = element_text(size = 8)
+    legend.text = element_text(size = 8),
+    axis.title.x = element_text(size = 9)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Minimized Cost Type')) +
@@ -128,7 +128,7 @@ minimized_total_cost <-
            fill = c("#66CC99", "#33CCCC", "#FF9966", "#FFFFCC")) +
   geom_text(
     aes(label = round(ssa_total/1e9, 2), digits = 3, format = "fg", flag = "#"),
-    size = 1.8,
+    size = 2.5,
     position = position_dodge(0.9),
     vjust = 0.5,
     hjust = -0.1,
@@ -144,15 +144,15 @@ minimized_total_cost <-
   scale_fill_brewer(palette = "Paired") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 5),
+    axis.text.x = element_text(size = 8),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
     plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 7),
-    axis.title.y = element_text(size = 7),
+    axis.text.y = element_text(size = 8),
+    axis.title.y = element_text(size = 8),
     legend.title = element_text(size = 6),
-    legend.text = element_text(size = 5),
-    axis.title.x = element_text(size = 8)
+    legend.text = element_text(size = 8),
+    axis.title.x = element_text(size = 9)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Minimized Cost Type')) +
@@ -376,4 +376,46 @@ dir.create(file.path(folder), showWarnings = FALSE)
 png(path, units = "in", width = 12, height = 12., res = 300)
 print(comb_map)
 dev.off()
+
+########################
+##SSA Potential Sites ##
+########################
+ssa_pop <-
+  readPNG(file.path(folder, 'figures', 'SSA_population.png'))
+
+ssa_sites <-
+  readPNG(file.path(folder, 'figures', 'SSA_potential_sites.png'))
+
+ssa_demand <-
+  readPNG(file.path(folder, 'figures', 'SSA_avg_demand.png'))
+
+### Sites ###
+pop <- ggplot() + background_image(ssa_pop) +
+  theme(plot.margin = margin(t = 0, l = 0, r = 0, b = 0, unit = "cm")) 
+
+sites <- ggplot() + background_image(ssa_sites) +
+  theme(plot.margin = margin(t = 0, l = 0, r = 0, b = 0, unit = "cm")) 
+
+### Demand ###
+demand <- ggplot() + background_image(ssa_demand) +
+  theme(plot.margin = margin(t = 0, l = 0, r = 0, b = 0, unit = "cm")) + 
+  ggspatial::annotation_north_arrow(location = "br")
+
+### Combine the Two maps ###
+two_maps <- ggarrange(sites, demand, ncol = 2,
+                      common.legend = T, legend = "bottom", labels = c('B', 'C'))
+
+three_maps <- ggarrange(pop, two_maps, nrow = 2,
+                     common.legend = T, legend = "bottom", labels = c('A'))
+
+###Save the combined image ###
+path = file.path(folder, "figures", "Combined_SSA_sites_maps.png")
+dir.create(file.path(folder), showWarnings = FALSE)
+png(path, units = "in", width = 10, height = 11., res = 300)
+print(three_maps)
+dev.off()
+
+
+
+
 

@@ -188,7 +188,7 @@ def ssa_sites():
     Sub-Saharan Africa.
     """
 
-    map_path = os.path.join(DATA_AFRICA, 'shapefile', 'Africa_Boundaries.shp')
+    map_path = os.path.join(DATA_AFRICA, 'shapefile', 'sub_saharan_africa.shp')
     path = os.path.join(DATA_AFRICA)
 
     customer = os.path.join(DATA_AFRICA, 'SSA_customers.csv')
@@ -202,7 +202,7 @@ def ssa_sites():
 
     country = gpd.read_file(map_path)
     sns.set(font_scale = 1.5)
-    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+    ax = country.plot(color = 'white', edgecolor = 'none', figsize = (10, 10))
 
     customer_df.plot(ax = ax, marker = 'X', color = 'blue', 
             markersize = 1, alpha = 0.5, label = 'Customers', legend = True)
@@ -214,12 +214,12 @@ def ssa_sites():
     ax.grid(b = True, which = 'minor', alpha = 0.25)
     ax.tick_params(labelsize = 10)
     plt.title('Customer and Potential EV Service Centers.', 
-            font = 'DejaVu Sans', fontsize = 12)
-    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 8})
-    legend.get_title().set_fontsize(9)
+            font = 'DejaVu Sans', fontsize = 20)
+    legend = plt.legend(facecolor = 'white', title = 'Potential Sites', prop = {'size': 17}, loc = 'upper right')
+    legend.get_title().set_fontsize(15)
     plt.tight_layout()
 
-    filename = 'SSA_potential_sites.jpg'
+    filename = 'SSA_potential_sites.png'
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     path_out = os.path.join(DATA_VIS, filename)
     
@@ -247,7 +247,7 @@ def ssa_demand():
     region_df = add_coordinates(df)
 
     sns.set(font_scale = 0.5)
-    ax = country.plot(color = 'white', edgecolor = 'black', figsize = (10, 10))
+    ax = country.plot(color = 'white', edgecolor = 'none', figsize = (10, 10))
     region_df.plot(ax = ax, column = 'demand', marker = 'o', c = 'demand', 
                    cmap = 'Paired', markersize = 500, alpha = 0.6)
     
@@ -273,7 +273,7 @@ def ssa_demand():
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
     
-    filename = 'SSA_annual_requests.jpg'
+    filename = 'SSA_annual_requests.png'
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     path_out = os.path.join(DATA_VIS, filename)
 
@@ -298,13 +298,14 @@ def ssa_demand_choropleth():
     gdf = gpd.GeoDataFrame(df_merged)
     gdf.set_geometry(col = 'geometry', inplace = True)
 
+    sns.set(font_scale = 1.5)
     fig, ax = plt.subplots(1, figsize = (10, 10))
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('bottom', size = '5%', pad = 0.3)
     gdf.plot(column = 'demand', legend = True,
-            cax = cax, ax = ax,
+            cax = cax, ax = ax, edgecolor = 'none',
             legend_kwds = {'label': 'Annual Requests', 'orientation': 'horizontal'})
-    ax.set_title('Average Sub-Regional Annual Requests')
+    ax.set_title('Average Sub-Regional Potential Annual Requests', fontsize = 20)
 
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     fig_path = os.path.join(DATA_VIS, 'SSA_avg_demand.png')
@@ -344,7 +345,7 @@ def discarded_ssa_sites():
     legend.get_title().set_fontsize(9)
     plt.tight_layout()
 
-    filename = 'SSA_discarded_sites.jpg'
+    filename = 'SSA_discarded_sites.png'
     DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
     path_out = os.path.join(DATA_VIS, filename)
     
@@ -364,11 +365,11 @@ if __name__ == '__main__':
             
             continue 
 
-        potential_sites(countries['iso3'].loc[idx])
-        average_demand(countries['iso3'].loc[idx])
-        discarded_sites(countries['iso3'].loc[idx])
+        #potential_sites(countries['iso3'].loc[idx])
+        #average_demand(countries['iso3'].loc[idx])
+        #discarded_sites(countries['iso3'].loc[idx])
 
     #ssa_sites()
     #ssa_demand()
     #discarded_ssa_sites()
-    #ssa_demand_choropleth()
+    ssa_demand_choropleth()
