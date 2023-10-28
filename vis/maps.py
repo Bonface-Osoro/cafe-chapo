@@ -43,7 +43,7 @@ def pop_density(iso3):
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('bottom', size = '5%', pad = 0.3)
     gdf.plot(column = 'population', legend = True,
-            cax = cax, ax = ax,
+            cax = cax, ax = ax, cmap = 'terrain',
             legend_kwds = {'label': 'Population', 'orientation': 'horizontal'})
     ax.set_title('Population Distribution')
 
@@ -72,12 +72,12 @@ def ssa_pop_density():
     gdf.rename(columns = {'geometry_y': 'geometry'}, inplace = True)
     gdf['geometry'] = gdf['geometry'].apply(wkt.loads)
     gdf.set_geometry(col = 'geometry', inplace = True)
-
+    
     sns.set(font_scale = 1.5)
     fig, ax = plt.subplots(1, figsize = (15, 10))
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('bottom', size = '5%', pad = 0.3)
-    gdf.plot(column = 'population', legend = True,
+    gdf.plot(column = 'population', legend = True, cmap = 'terrain',
             cax = cax, ax = ax, edgecolor = 'none',
             legend_kwds = {'label': 'Population', 'orientation': 'horizontal'})
     ax.set_title('Population Distribution of Sub-Saharan Africa', fontsize = 20)
@@ -87,6 +87,7 @@ def ssa_pop_density():
 
 
     return None
+
 
 if __name__ == '__main__':
 
@@ -98,5 +99,5 @@ if __name__ == '__main__':
             
             continue 
 
-        #pop_density(countries['iso3'].loc[idx]) 
+        pop_density(countries['iso3'].loc[idx]) 
     ssa_pop_density()           

@@ -206,6 +206,37 @@ def generate_ssa_shapefile(iso3):
 
     return None
 
+
+def case_countries(selected_countries):
+    """
+    This function aggregates results for 
+    four selected countries for the case 
+    study
+
+    Parameters
+    ----------
+    selected_countries : list
+        List of countries selected. 
+    """
+    DATA_AFRICA = os.path.join(BASE_PATH, '..', 'results', 'SSA')
+    csv_data = os.path.join(DATA_AFRICA, 'SSA_optimized_ev_center.csv')
+    df = pd.read_csv(csv_data)
+    df = df[df['iso3'].isin(selected_countries)]
+
+    fileout = 'four_countries.csv'
+    folder_out = os.path.join(DATA_AFRICA)
+
+    if not os.path.exists(folder_out):
+
+        os.makedirs(folder_out)
+
+    path_out = os.path.join(folder_out, fileout)
+    df.to_csv(path_out, index = False)
+
+
+    return None
+
+
 if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
@@ -215,9 +246,12 @@ if __name__ == '__main__':
             
             continue 
 
-        #csv_merger('_customers.csv', countries['iso3'].loc[idx])
-        #csv_merger('_ev_centers.csv', countries['iso3'].loc[idx])
+        csv_merger('_customers.csv', countries['iso3'].loc[idx])
+        csv_merger('_ev_centers.csv', countries['iso3'].loc[idx])
         csv_merger('_optimized_ev_center.csv', countries['iso3'].loc[idx])
-        #csv_merger('_region.csv', countries['iso3'].loc[idx])
-        #pop_csv_merger(countries['iso3'].loc[idx])
-        #generate_ssa_shapefile(countries['iso3'].loc[idx])
+        csv_merger('_region.csv', countries['iso3'].loc[idx])
+        pop_csv_merger(countries['iso3'].loc[idx])
+        generate_ssa_shapefile(countries['iso3'].loc[idx])
+
+selected_countries = ['KEN', 'GHA', 'CMR', 'MOZ']
+case_countries(selected_countries)
