@@ -191,7 +191,7 @@ def linear_problem(iso3):
         lp_problem += objective
 
         # Costraint: the customer request must be met
-        for i in df['customer_id']:
+        '''for i in df['customer_id']:
 
             lp_problem += lpSum(served_customer[(i, j)] for j in df1['ev_center_id']) == demand_dict[i]
 
@@ -208,7 +208,7 @@ def linear_problem(iso3):
 
                 for j in df1['ev_center_id']:
 
-                    lp_problem += served_customer[(i,j)] <= demand_dict[i] * built_ev_center[j]
+                    lp_problem += served_customer[(i,j)] <= demand_dict[i] * built_ev_center[j]'''
         
         solver = pulp.PULP_CBC_CMD(msg = False)
         lp_problem.solve(solver)
@@ -313,7 +313,7 @@ if __name__ == '__main__':
     for idx, country in countries.iterrows():
 
         #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'KEN':
+        if not country['iso3'] == 'COD':
             
             continue 
 
