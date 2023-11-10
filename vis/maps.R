@@ -8,108 +8,109 @@ library(sf)
 
 suppressMessages(library(tidyverse))
 folder <- dirname(rstudioapi::getSourceEditorContext()$path)
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_optimized_ev_center.csv'))
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_population_results.csv'))
 data <- data %>%
   mutate(value = c(1))
 
-#############################
+##############################
 ##Top 5 Populated Countries ##
-#############################
-top_countries <- data %>%
+##############################
+top_countries = data %>%
   group_by(iso3, region) %>%
   summarise(total_density = mean(pop_density)) %>%
   arrange(desc(total_density)) %>%
   head(10)
 
-data$iso3 = factor(
-  data$iso3,
-  levels = c('GNB', 'SEN', 'NGA', 'TGO', 'KEN', 'MUS', 'MLI', 'NAM', 'BDI', 'BEN'),
-  labels = c('Guinea Bissau', 'Senegal', 'Nigeria', 'Togo', 'Kenya', 
-             'Mauritius', 'Mali', 'Namibia', 'Burundi', 'Benin'))
+top_countries$iso3 = factor(
+  top_countries$iso3,
+  levels = c('BDI', 'KEN', 'AGO', 'BEN', 'NGA', 'SEN', 'SLE', 'MUS', 'RWA', 'ETH'),
+  labels = c('Burundi', 'Kenya', 'Angola', 'Benin', 'Nigeria', 'Senegal', 
+             'Sierraleone', 'Mauritius', 'Rwanda', 'Ethiopia'))
 
 
-countries_10 <- ggplot(data = top_countries, aes(x = reorder(iso3, -total_density), y = total_density, fill = region)) +
+countries_10 <- ggplot(data = top_countries, aes(x = reorder(iso3, 
+    -total_density), y = total_density, fill = region)) +
   geom_bar(stat = 'identity', position = position_dodge(0.9)) + coord_flip() + 
   geom_text(aes(label = formatC(signif(after_stat(y), 3), 
-                                digits = 3, format = "fg", flag = "#")),
-            size = 1.8, position = position_dodge(0.9),
-            vjust = 0.5, hjust = -0.3) + scale_fill_brewer(palette = "Set2") +
+     digits = 3, format = "fg", flag = "#")), size = 1.8, position = 
+    position_dodge(0.9), vjust = 0.5, hjust = -0.3) + 
+    scale_fill_brewer(palette = "Paired") +
   labs(colour = NULL,
-       title = 'Top 10 SSA Densely Populated Countries',
+       title = NULL,
+       subtitle = 'Most densely populated SSA countries.',
        x = NULL,
-       fill = NULL) + ylab(expression('Number of People (km'^2*')')) +
+       fill = NULL) + ylab(expression('Average People per Area (people per km'^2*')')) +
   theme(legend.position = 'bottom',
-        axis.text.x = element_text(size = 5),
+        axis.text.x = element_text(size = 6),
         panel.spacing = unit(0.6, "lines"),
         plot.title = element_text(size = 11),
-        plot.subtitle = element_text(size = 10),
-        axis.text.y = element_text(size = 7),
+        plot.subtitle = element_text(size = 9),
+        axis.text.y = element_text(size = 6),
         legend.title = element_text(size = 8),
         legend.text = element_text(size = 7),
-        axis.title.x = element_text(size = 8),
+        axis.title.x = element_text(size = 7),
         axis.title.y = element_markdown(size = 7)) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 5, title = 'SSA Regions')) +
   scale_x_discrete(expand = c(0, 0.15)) +
   scale_y_continuous(expand = c(0, 0),
-  labels = function(y) format(y, scientific = FALSE),limits = c(0, 5000)) 
+  labels = function(y) format(y, scientific = FALSE),limits = c(0, 2300)) 
 
 
 #################################
 ##Bottom 5 Populated Countries ##
 #################################
-data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_optimized_ev_center.csv'))
-data <- data %>%
-  mutate(value = c(1))
-
-bottom_countries <- data %>%
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_population_results.csv'))
+bottom_countries = data %>%
   group_by(iso3, region) %>%
   summarise(total_density = mean(pop_density)) %>%
   arrange(desc(total_density)) %>%
   tail(10)
 
-data$iso3 = factor(
-  data$iso3,
-  levels = c('GAB', 'MRT', 'COG', 'CAF', 'SOM', 'GIN', 'MOZ', 'ZMB', 'SSD', 'BFA'),
-  labels = c('Gabon', 'Mauritania', 'Republic of Congo', 'Central African Republic', 
-             'Somalia', 'Guinea', 'Mozambique', 'Zimbabwe', 'South Sudan', 'Burkina Fasso'))
+bottom_countries$iso3 = factor(
+  bottom_countries$iso3,
+  levels = c('GAB', 'SSD', 'MDG', 'LSO', 'SWZ', 'CAF', 'MRT', 'MOZ', 'DJI', 'ZWE'),
+  labels = c('Gabon', 'South Sudan', 'Madagascar', 'Lesotho', 'Eswatini',
+             'Central African \nRepublic', 'Mauritania', 'Mozambique', 'Djibouti', 
+             'Zimbabwe'))
 
-
-countries_bottom_10 <- ggplot(data = bottom_countries, aes(x = reorder(iso3, -total_density), y = total_density, fill = region)) +
+countries_bottom_10 <- ggplot(data = bottom_countries, aes(x = reorder(iso3, 
+    -total_density), y = total_density, fill = region)) +
   geom_bar(stat = 'identity', position = position_dodge(0.9)) + coord_flip() + 
   geom_text(aes(label = formatC(signif(after_stat(y), 3), 
-                                digits = 3, format = "fg", flag = "#")),
-            size = 1.8, position = position_dodge(0.9),
-            vjust = 0.5, hjust = -0.3) + scale_fill_brewer(palette = "Set2") +
+     digits = 3, format = "fg", flag = "#")), size = 1.8, position = 
+     position_dodge(0.9), vjust = 0.5, hjust = -0.3) + 
+  scale_fill_brewer(palette = "Paired") +
   labs(colour = NULL,
-       title = 'Bottom 10 SSA Populated Countries',
+       title = NULL,
+       subtitle = 'Least densely populated SSA countries.',
        x = NULL,
-       fill = NULL) + ylab(expression('Number of People (km'^2*')')) +
+       fill = NULL) + ylab(expression('Average People per Area (people per km'^2*')')) +
   theme(legend.position = 'bottom',
-        axis.text.x = element_text(size = 5),
+        axis.text.x = element_text(size = 6),
         panel.spacing = unit(0.6, "lines"),
         plot.title = element_text(size = 11),
-        plot.subtitle = element_text(size = 10),
-        axis.text.y = element_text(size = 7),
+        plot.subtitle = element_text(size = 9),
+        axis.text.y = element_text(size = 6),
         legend.title = element_text(size = 8),
         legend.text = element_text(size = 7),
-        axis.title.x = element_text(size = 8),
+        axis.title.x = element_text(size = 7),
         axis.title.y = element_markdown(size = 7)) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 5, title = 'SSA Regions')) +
   scale_x_discrete(expand = c(0, 0.15)) +
-  scale_y_continuous(expand = c(0, 0),
-                     labels = function(y) format(y, scientific = FALSE),limits = c(0, 70)) 
+  scale_y_continuous(expand = c(0, 0), labels = function(y) 
+    format(y, scientific = FALSE),limits = c(0, 105)) 
 
 #############################
 ##Top and Bottom Countries ##
 #############################
-countries_10 <-
+countries <-
   ggarrange(
-    countries_10,
     countries_bottom_10,
+    countries_10,
     ncol = 2,
-    common.legend = FALSE,
+    common.legend = F,
     labels = c('A', 'B'),
     legend = 'bottom'
   )
@@ -120,16 +121,18 @@ dir.create(file.path(folder, 'figures'), showWarnings = FALSE)
 png(
   path,
   units = "in",
-  width = 6,
-  height = 6.5,
+  width = 8,
+  height = 4,
   res = 480
 )
-print(countries_10)
+print(countries)
 dev.off()
 
 #############################
 ##Built EV Service Centers ##
 #############################
+data <- read.csv(file.path(folder, '..', 'results', 'SSA', 'SSA_optimized_ev_center.csv'))
+
 df = data %>%
   group_by(region, build) %>%
   summarize(total = sum(value))
@@ -142,7 +145,7 @@ df$build = factor(
 
 built_sites <-
   ggplot(df,  aes(x = region, y = total, fill = build)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(stat = "identity", position = position_dodge(), width = 0.98) +
   geom_text(
     aes(label = total, digits = 3, format = "fg", flag = "#"),
     size = 2,
@@ -153,23 +156,22 @@ built_sites <-
   ) +
   labs(
     colour = NULL,
-    title = 'Proposed Number of Electric Vehicle (EV) Service Centers to be Built.',
-    subtitle = 'Reported by African Union Regional Classification.',
+    title = 'Sub-Saharan Africa (SSA).',
+    subtitle = 'Proposed number of EV service centers to be built.',
     x = 'Sub-Saharan African Regions',
-    y = "Number of EV Service Centers",
-  ) +  ylab('Number of EV Service Centers') + 
+  ) +  ylab('Number of EV \nService Centers') + 
   scale_fill_brewer(palette = "Set2") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 8),
+    axis.text.x = element_text(size = 6),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
-    plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 8),
-    axis.title.y = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 8),
-    axis.title.x = element_text(size = 9)
+    plot.subtitle = element_text(size = 7),
+    axis.text.y = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    legend.title = element_text(size = 5),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 6)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Decision')) +
@@ -178,7 +180,7 @@ built_sites <-
     expand = c(0, 0),
     labels = function(y)
       format(y, scientific = FALSE),
-    limits = c(0, 215)
+    limits = c(0, 220)
   ) 
 
 ##########################################
@@ -188,9 +190,9 @@ df = data %>%
   group_by(region) %>%
   summarize(ssa_mean = mean(minimized_cost))
 
-minimized_average_cost <-
+min_avg_ssa <-
   ggplot(df,  aes(x = region, y = ssa_mean/1e6)) +
-  geom_bar(width = 0.98, stat = "identity", position = position_dodge(0.9),
+  geom_bar(width = 0.98, stat = "identity", position = position_dodge(),
            fill = c("#66CC99", "#33CCCC", "#FF9966", "#FFFFCC")) +
   geom_text(
     aes(label = round(ssa_mean/1e6, 2), digits = 3, format = "fg", flag = "#"),
@@ -202,23 +204,23 @@ minimized_average_cost <-
   ) + 
   labs(
     colour = NULL,
-    title = 'Minimized Average Costs',
-    subtitle = NULL,
+    title = 'Sub-Saharan Africa (SSA).',
+    subtitle = 'Average costs by African Union Regions.',
     x = 'Sub-Saharan African Regions',
     y = "Number of EV Service Centers",
-  ) +  ylab('Minimized Average Costs (million dollars)') + 
+  ) +  ylab('Minimized Average \nCosts (million dollars)') + 
   scale_fill_brewer(palette = "Paired") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 8),
+    axis.text.x = element_text(size = 6),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
-    plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 8),
-    axis.title.y = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 8),
-    axis.title.x = element_text(size = 9)
+    plot.subtitle = element_text(size = 7),
+    axis.text.y = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    legend.title = element_text(size = 5),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 6)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Minimized Cost Type')) +
@@ -227,7 +229,7 @@ minimized_average_cost <-
     expand = c(0, 0),
     labels = function(y)
       format(y, scientific = FALSE),
-    limits = c(0, 8)
+    limits = c(0, 15)
   )
 
 ##########################################
@@ -237,9 +239,9 @@ df = data %>%
   group_by(region) %>%
   summarize(ssa_total = sum(minimized_cost))
 
-minimized_total_cost <-
+total_cost_ssa <-
   ggplot(df,  aes(x = region, y = ssa_total/1e9)) +
-  geom_bar(width = 0.98, stat = "identity", position = position_dodge(0.9),
+  geom_bar(width = 0.98, stat = "identity", position = position_dodge(),
            fill = c("#66CC99", "#33CCCC", "#FF9966", "#FFFFCC")) +
   geom_text(
     aes(label = round(ssa_total/1e9, 2), digits = 3, format = "fg", flag = "#"),
@@ -251,23 +253,23 @@ minimized_total_cost <-
   ) + 
   labs(
     colour = NULL,
-    title = 'Minimized Total Costs',
-    subtitle = NULL,
+    title = 'Sub-Saharan Africa (SSA).',
+    subtitle = 'Total costs by African Union Regions.',
     x = 'Sub-Saharan African Regions',
     y = "Number of EV Service Centers",
-  ) +  ylab('Minimized Total Costs (billion dollars)') + 
+  ) +  ylab('Minimized Total \nCosts (billion dollars)') + 
   scale_fill_brewer(palette = "Paired") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 8),
+    axis.text.x = element_text(size = 6),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
-    plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 8),
-    axis.title.y = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 8),
-    axis.title.x = element_text(size = 9)
+    plot.subtitle = element_text(size = 7),
+    axis.text.y = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    legend.title = element_text(size = 5),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 6)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Minimized Cost Type')) +
@@ -276,8 +278,7 @@ minimized_total_cost <-
     expand = c(0, 0),
     labels = function(y)
       format(y, scientific = FALSE),
-    limits = c(0, 3)
-  )
+    limits = c(0, 3))
 
 
 ####################################
@@ -285,11 +286,11 @@ minimized_total_cost <-
 ####################################
 ssa_costs <-
   ggarrange(
-    minimized_average_cost,
-    minimized_total_cost,
+    min_avg_ssa,
+    total_cost_ssa,
     ncol = 2,
     common.legend = TRUE,
-    labels = c('B', 'C'),
+    labels = c('C', 'D'),
     legend = 'bottom'
   )
 
@@ -345,7 +346,7 @@ df$iso3 = factor(
 
 built_sites_4 <-
   ggplot(df,  aes(x = iso3, y = total, fill = build)) +
-  geom_bar(width = 1, stat = "identity", position = position_dodge(0.9)) +
+  geom_bar(width = 0.98, stat = "identity", position = position_dodge()) +
   geom_text(
     aes(label = total, digits = 3, format = "fg", flag = "#"),
     size = 2,
@@ -356,23 +357,22 @@ built_sites_4 <-
   ) +
   labs(
     colour = NULL,
-    title = 'Proposed Number of Electric Vehicle (EV) Service Centers to be Built.',
-    subtitle = 'Reported by African Union Regional Classification.',
-    x = NULL,
-    y = "Number of EV Service Centers",
-  ) +  ylab('Number of EV Service Centers') + 
+    title = 'Case-Study Countries.',
+    subtitle = 'Proposed number of EV service centers to be built.',
+    x = 'Case-Study countries',
+  ) +  ylab('Number of EV \nService Centers') + 
   scale_fill_brewer(palette = "Set2") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 8),
+    axis.text.x = element_text(size = 6),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
-    plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 8),
-    axis.title.y = element_text(size = 8),
-    legend.title = element_text(size = 8),
-    legend.text = element_text(size = 8),
-    axis.title.x = element_text(size = 9)
+    plot.subtitle = element_text(size = 7),
+    axis.text.y = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    legend.title = element_text(size = 5),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 6)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Decision')) +
@@ -398,9 +398,9 @@ df$iso3 = factor(
   labels = c('Cameroon', 'Ghana', 'Kenya', 'Mozambique')
 )
 
-minimized_average_cost_4 <-
+min_avg_4 <-
   ggplot(df,  aes(x = iso3, y = ssa_mean/1e6)) +
-  geom_bar(width = 0.98, stat = "identity", position = position_dodge(0.9),
+  geom_bar(width = 0.98, stat = "identity", position = position_dodge(),
            fill = c("#66CC99", "#33CCCC", "#FF9966", "#FFFFCC")) +
   geom_text(
     aes(label = round(ssa_mean/1e6, 2), digits = 3, format = "fg", flag = "#"),
@@ -412,23 +412,23 @@ minimized_average_cost_4 <-
   ) + 
   labs(
     colour = NULL,
-    title = 'Minimized Average Costs',
-    subtitle = NULL,
-    x = NULL,
+    title = 'Case-Study Countries.',
+    subtitle = 'Average costs for selected countries.',
+    x = 'Case-Study Countries.',
     y = "Number of EV Service Centers",
-  ) +  ylab('Minimized Average Costs (million dollars)') + 
+  ) +  ylab('Minimized Average \nCosts (million dollars)') + 
   scale_fill_brewer(palette = "Paired") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 8),
+    axis.text.x = element_text(size = 6),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
-    plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 8),
-    axis.title.y = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 8),
-    axis.title.x = element_text(size = 9)
+    plot.subtitle = element_text(size = 7),
+    axis.text.y = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    legend.title = element_text(size = 5),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 6)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Minimized Cost Type')) +
@@ -454,9 +454,9 @@ df$iso3 = factor(
   labels = c('Cameroon', 'Ghana', 'Kenya', 'Mozambique')
 )
 
-minimized_total_cost_4 <-
+min_total_cost_4 <-
   ggplot(df,  aes(x = iso3, y = ssa_total/1e6)) +
-  geom_bar(width = 0.98, stat = "identity", position = position_dodge(0.9),
+  geom_bar(width = 0.98, stat = "identity", position = position_dodge(),
            fill = c("#66CC99", "#33CCCC", "#FF9966", "#FFFFCC")) +
   geom_text(
     aes(label = round(ssa_total/1e6, 2), digits = 3, format = "fg", flag = "#"),
@@ -468,23 +468,23 @@ minimized_total_cost_4 <-
   ) + 
   labs(
     colour = NULL,
-    title = 'Minimized Total Costs',
-    subtitle = NULL,
-    x = NULL,
+    title = 'Case-Study Countries.',
+    subtitle = 'Total costs for selected countries.',
+    x = 'Case-Study Countries.',
     y = "Number of EV Service Centers",
-  ) +  ylab('Minimized Total Costs (million dollars)') + 
+  ) +  ylab('Minimized Total \nCosts (million dollars)') + 
   scale_fill_brewer(palette = "Paired") +
   theme(
     legend.position = 'bottom',
-    axis.text.x = element_text(size = 8),
+    axis.text.x = element_text(size = 6),
     panel.spacing = unit(0.6, "lines"),
     plot.title = element_text(size = 11),
-    plot.subtitle = element_text(size = 10),
-    axis.text.y = element_text(size = 8),
-    axis.title.y = element_text(size = 8),
-    legend.title = element_text(size = 6),
-    legend.text = element_text(size = 8),
-    axis.title.x = element_text(size = 9)
+    plot.subtitle = element_text(size = 7),
+    axis.text.y = element_text(size = 6),
+    axis.title.y = element_text(size = 6),
+    legend.title = element_text(size = 5),
+    legend.text = element_text(size = 6),
+    axis.title.x = element_text(size = 6)
   ) +
   expand_limits(y = 0) +
   guides(fill = guide_legend(ncol = 6, title = 'Minimized Cost Type')) +
@@ -500,25 +500,43 @@ minimized_total_cost_4 <-
 ##########################
 ##4 Africa cost Results ##
 ##########################
-four_costs <-
+averages <-
   ggarrange(
-    minimized_average_cost_4,
-    minimized_total_cost_4,
+    min_avg_ssa,
+    min_avg_4,
     ncol = 2,
     common.legend = TRUE,
-    labels = c('B', 'C'),
+    labels = c('C', 'D'),
     legend = 'bottom'
   )
-
+totals <- 
+  ggarrange(
+    total_cost_ssa,
+    min_total_cost_4,
+    ncol = 2,
+    common.legend = TRUE,
+    labels = c('E', 'F'),
+    legend = 'bottom'
+  )
 ############################
 ##4 African Panel Results ##
 ############################
 four_results <-
   ggarrange(
+    built_sites,
     built_sites_4,
-    four_costs,
-    nrow = 2,
+    common.legend = TRUE,
+    legend = 'bottom',
+    ncol = 2,
     labels = c('A', 'B')
+  )
+
+combined <-
+  ggarrange(
+    four_results,
+    averages,
+    totals,
+    nrow = 3
   )
 
 path = file.path(folder, 'figures', 'four_ev_sites.png')
@@ -527,10 +545,10 @@ png(
   path,
   units = "in",
   width = 6,
-  height = 6.5,
+  height = 7,
   res = 480
 )
-print(four_results)
+print(combined)
 dev.off()
 
 ########################
@@ -734,7 +752,7 @@ demand <- ggplot() + background_image(ssa_demand) +
 
 ### Combine the Two maps ###
 two_maps <- ggarrange(sites, demand, ncol = 2,
-                      common.legend = T, legend = "bottom", labels = c('B', 'C'))
+                      common.legend = T, legend = "bottom", labels = c('A', 'B'))
 
 three_maps <- ggarrange(pop, two_maps, nrow = 2,
                      common.legend = T, legend = "bottom", labels = c('A'))
@@ -742,8 +760,8 @@ three_maps <- ggarrange(pop, two_maps, nrow = 2,
 ###Save the combined image ###
 path = file.path(folder, "figures", "Combined_SSA_sites_maps.png")
 dir.create(file.path(folder), showWarnings = FALSE)
-png(path, units = "in", width = 10, height = 11., res = 300)
-print(three_maps)
+png(path, units = "in", width = 10, height = 5.5, res = 300)
+print(two_maps)
 dev.off()
 
 

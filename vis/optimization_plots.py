@@ -283,38 +283,6 @@ def ssa_demand():
     return None
 
 
-def ssa_demand_choropleth():
-    """
-    This function plots the population 
-    distribution of Sub-Saharan Africa
-    """
-    map_path = os.path.join(DATA_AFRICA, 'shapefile', 'sub_saharan_africa.shp')
-    path = os.path.join(DATA_AFRICA, 'SSA_region.csv')
-
-    map_df = gpd.read_file(map_path)
-    df = pd.read_csv(path)
-
-    df_merged  = map_df.merge(df, left_on = 'GID_1', right_on = 'GID_1')
-    gdf = gpd.GeoDataFrame(df_merged)
-    gdf.set_geometry(col = 'geometry', inplace = True)
-
-    sns.set(font_scale = 1.5)
-    fig, ax = plt.subplots(1, figsize = (10, 10))
-    divider = make_axes_locatable(ax)
-    cax = divider.append_axes('bottom', size = '5%', pad = 0.3)
-    gdf.plot(column = 'demand', legend = True,
-            cax = cax, ax = ax, edgecolor = 'none',
-            legend_kwds = {'label': 'Annual Requests', 'orientation': 'horizontal'})
-    ax.set_title('Average Sub-Regional Potential Annual Requests', fontsize = 20)
-
-    DATA_VIS = os.path.join(BASE_PATH, '..', 'vis', 'figures')
-    fig_path = os.path.join(DATA_VIS, 'SSA_avg_demand.png')
-    plt.savefig(fig_path, dpi = 720)
-
-
-    return None
-
-
 def discarded_ssa_sites():
     """
     This function plots the selected 
@@ -372,4 +340,3 @@ if __name__ == '__main__':
     #ssa_sites()
     #ssa_demand()
     #discarded_ssa_sites()
-    ssa_demand_choropleth()
