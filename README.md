@@ -16,7 +16,7 @@ Results
 ==============
 `Figure 2` shows the potential annual customer care EV service requests by country sub-regions for Kenya, Mozambique, Cameroon and Ghana.
 
-#### Figure 2 Projected Customer Demand Across four Sub-Saharan Africa Countries.
+#### Figure 2 Proposed EV service centers and projected potential customer demand across Sub-Saharan Africa regions.
 <p align="center">
   <img src="/docs/Combined_SSA_sites_maps.png" />
 </p>
