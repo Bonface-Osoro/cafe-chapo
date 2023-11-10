@@ -392,19 +392,20 @@ class ProcessPopulation:
 
                 output.append({
                     'iso3':boundary['GID_0'],
+                    'region':boundary['NAME_1'],
                     'admin_name':boundary['NAME_1'],
-                    'GID_1': boundary[gid_region],
+                    'GID_1': boundary['GID_1'],
                     'population': population,
                     'latitude': boundary['latitude'],
                     'longitude': boundary['longitude'],
                     'geometry': boundary['geometry'],
-                    'area': boundary['geometry'].area
+                    'area': (boundary['geometry'].area) * 12309
                 })
 
         df = pd.DataFrame(output)
         df.dropna(subset = ['population'], inplace = True)
         df['population'] = df['population'].astype(int)
-        df['pop_density'] = (df['population'] / (df['area'] * 12309)).astype(int)
+        df['pop_density'] = (df['population'] / (df['area']))
         df[['latitude', 'longitude']] = df[['latitude', 'longitude']].round(4)
         df['capital'] = ''
         for i in range(len(df)):

@@ -23,8 +23,8 @@ if __name__ == '__main__':
 
     for idx, country in countries.iterrows():
 
-        #if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
-        if not country['iso3'] == 'MWI':
+        if not country['region'] == 'Sub-Saharan Africa' or country['Exclude'] == 1:   
+        #if not country['iso3'] == 'KEN':
             
             continue 
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
         populations = ProcessPopulation(path, countries['iso3'].loc[idx], countries['lowest'].loc[idx], pop_tif_loc)
         #populations.process_national_population()
-        #populations.process_population_tif()
+        populations.process_population_tif()
 
         supply_demand = SupplyDemand(countries['iso3'].loc[idx])
         supply_demand.customer_ev_centers()

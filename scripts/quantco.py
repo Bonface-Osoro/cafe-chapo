@@ -22,7 +22,7 @@ central = ['CMR', 'CAF', 'TCD', 'COD', 'GNQ', 'GAB', 'STP']
 
 eastern = ['BDI', 'COM', 'DJI', 'ERI', 'ETH', 'SWZ', 'MDG', 
            'KEN', 'MUS', 'SDN', 'SYC', 'SOM', 'SSD', 'UGA', 
-           'TZA']
+           'TZA', 'RWA']
 
 west = ['BEN', 'BFA', 'CPV', 'CIV', 'GMB', 'GHA', 'GIN', 
         'GNB', 'LBR', 'MLI', 'MRT', 'NER', 'NGA', 'SEN', 
@@ -251,7 +251,7 @@ if __name__ == '__main__':
         csv_merger('_optimized_ev_center.csv', countries['iso3'].loc[idx])
         csv_merger('_region.csv', countries['iso3'].loc[idx])
         pop_csv_merger(countries['iso3'].loc[idx])
-        generate_ssa_shapefile(countries['iso3'].loc[idx])
+        #generate_ssa_shapefile(countries['iso3'].loc[idx])
 
 selected_countries = ['KEN', 'GHA', 'CMR', 'MOZ']
-case_countries(selected_countries)
+#case_countries(selected_countries)
